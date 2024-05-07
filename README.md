@@ -71,4 +71,9 @@ public function members(): BelongsToMany<br>
 
     </li>
 
+<li>
+    Buat resource baru<br>
+    <pre>php artisan make:filament-resource Category --generate --simple</pre><br>
+    --simple adalah opsional
+</li>
 </ol>
