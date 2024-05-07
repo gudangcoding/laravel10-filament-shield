@@ -1,4 +1,4 @@
-<h1>Langkah Langkah</h1>
+<h1>Langkah Langkah filament panel multi tenant dan shield</h1>
 <ol>
     <li><pre>composer create-project laravel/laravel:^10.0 nama_proyek</pre></li>
     <li><pre>composer require filament/filament:"^3.2" -W</pre></li>
@@ -75,5 +75,18 @@ public function members(): BelongsToMany<br>
     Buat resource baru<br>
     <pre>php artisan make:filament-resource Category --generate --simple</pre><br>
     --simple adalah opsional
+</li>
+<li>jalanakan ulang php artisan shield:install jika migrasi refresh</li>
+<li>
+    untuk role atau yang lainnya jika diperlukan tambahkan kode ini<br>
+     public static ?string $tenantOwnershipRelationshipName = 'team';<br>
+    protected static  ?string $tenantRelationshipName = 'role';<br>
+</li>
+<li>
+tambahkan ini pada Spatie\Permission\Models\Role<br>
+    public function team(): BelongsTo<br>
+    {<br>
+        return $this->belongsTo(\App\Models\Team::class);<br>
+    }<br>
 </li>
 </ol>
