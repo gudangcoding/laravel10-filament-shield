@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+    protected static ?string $tenantRelationshipName = 'members';
     protected static ?string $navigationLabel = 'Pengguna';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
