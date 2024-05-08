@@ -5,6 +5,7 @@ namespace App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ListUsers extends ListRecords
 {
@@ -15,5 +16,10 @@ class ListUsers extends ListRecords
         return [
             Actions\CreateAction::make(),
         ];
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return "Daftar Pengguna";
     }
 }

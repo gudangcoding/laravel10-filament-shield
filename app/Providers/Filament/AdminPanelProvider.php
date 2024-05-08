@@ -20,11 +20,18 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Spatie\Permission\Traits\HasRoles;
 
 class AdminPanelProvider extends PanelProvider
 {
+
     public function panel(Panel $panel): Panel
     {
+
+        // $role_name = auth()->user()->roles->pluck('name')->first();
+        // $tampil = $role_name ? 'super_admin' || 'admin' : \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make();
+        // $tampil = ($role_name === 'super_admin' || $role_name === 'admin') ? \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make() : null;
+
         return $panel
             ->default()
             ->id('admin')
@@ -59,13 +66,9 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                // auth()->user()->roles->contains('name', 'super_admin') || auth()->user()->roles->contains('name', 'admin')
-                //     ? \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()
-                //     : null,
-                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()
-
+                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
             ])
-            ->tenant(Team::class, ownershipRelationship: 'team')
+            ->tenant(Team::class, ownershipRelationship: 'team', slugAttribute: 'slug')
             ->tenantRegistration(RegisterTeam::class)
             ->tenantProfile(EditTeamProfile::class);
     }

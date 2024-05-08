@@ -4,50 +4,74 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Filament\Resources\ProductResource\RelationManagers\ProductVariantRelationManager;
 use App\Models\Category;
 use App\Models\Product;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use App\Models\Team;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
+
+
+    // protected static ?string $tenantOwnershipRelationshipName = 'products';
+    protected static ?string $tenantRelationshipName = 'produk';
     protected static ?string $navigationLabel = 'Produk';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    // protected static ?string $navigationGroup = 'Master Data';
+    protected static ?string $navigationGroup = 'Master Data';
     public static function form(Form $form): Form
     {
+        $user = Auth::user();
+        $teamId = Filament::getTenant()->id; //$user->currentTeam->id
+
+
+
         return $form
             ->schema([
-                Section::make('Product Information')
+                Section::make('Product Form')
                     ->columns(2)
                     ->schema([
                         Card::make()
                             ->schema([
-                                TextInput::make('name')->label('Name')->required(),
-                                TextInput::make('slug')->label('Slug')->required(),
-                                TextInput::make('satuan')->label('Satuan')->required(),
-                                Select::make('kategori')
+
+                                TextInput::make('name')
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(
+                                        fn (Set $set, ?string $state) =>
+                                        $set('slug', str::slug($state))
+                                    )
+                                    ->label('Name')
+                                    ->required(),
+                                TextInput::make('slug')->label('Slug'),
+                                Select::make('category_id')
                                     ->label('Kategori')
-                                    ->options(Category::pluck('name', 'id')->toArray()),
-                                TextInput::make('deskripsi')->label('Deskripsi')->required(),
-                                FileUpload::make('gambar')
-                                    ->label('Gambar')
-                                    ->image(),
-                                TextInput::make('harga')->label('Harga')->required(),
-                                TextInput::make('stok')->label('Stok')->required(),
-                            ])->columns(4),
+                                    ->options(Category::pluck('name', 'id')->toArray())
+                                    ->default($form->getRecord()->category_id ?? null),
+                                TextInput::make('deskripsi')->label('Deskripsi'),
+                                Hidden::make('team_id')->default($teamId),
+                                Hidden::make('user_id')->default($user->id)
+                            ])->columns(2),
+
 
                     ]),
             ]);
@@ -61,28 +85,13 @@ class ProductResource extends Resource
                     ->label('Nama')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->label('Slug')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('satuan')
-                    ->label('Satuan')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('kategori')
+                Tables\Columns\TextColumn::make('categories.name')
                     ->label('Kategori')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('deskripsi')
                     ->label('Deskripsi')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('harga')
-                    ->label('Harga')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('stok')
-                    ->label('Stok')
-                    ->sortable(),
-                Tables\Columns\ImageColumn::make('gambar')
-                    ->label('Gambar')
-                    ->sortable(),
+
             ])
             ->filters([
                 //
@@ -100,7 +109,7 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ProductVariantRelationManager::class,
         ];
     }
 

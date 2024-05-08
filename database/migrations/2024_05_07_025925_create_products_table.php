@@ -13,16 +13,22 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('team_id')->constrained()->cascadeOnDelete()->nullable();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->nullable();
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete()->nullable();
+            $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('name');
-            $table->string('slug');
-            $table->string('satuan');
-            $table->string('kategori')->nullable();
+            $table->string('slug')->nullable();
             $table->string('deskripsi')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('product_variants', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('gambar')->nullable();
-            $table->string('harga');
+            $table->string('harga')->nullable();
+            $table->string('satuan')->nullable();
+            $table->string('isi')->nullable();
             $table->string('stok');
             $table->timestamps();
         });
@@ -33,6 +39,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('product_price');
         Schema::dropIfExists('products');
     }
 };

@@ -29,6 +29,7 @@ class SalesOrderResource extends Resource
 {
     protected static ?string $model = SalesOrder::class;
     protected static ?string $navigationLabel = 'Sales Order';
+    protected static ?string $navigationGroup = 'Marketing';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     // protected static ?string $navigationGroup = 'Sales';
@@ -118,9 +119,9 @@ class SalesOrderResource extends Resource
     {
         $query = parent::getEloquentQuery();
         //jika bukan admin atau super admin
-        if (!auth()->user()->hasRole('admin') || !auth()->user()->hasRole('super_admin')) {
-            $query->where('user_id', auth()->id());
-        }
+        // if (!auth()->user()->hasRole('admin') || !auth()->user()->hasRole('super_admin')) {
+        //     $query->where('user_id', auth()->id());
+        // }
 
         return $query;
     }

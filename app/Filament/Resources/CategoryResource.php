@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -24,6 +25,7 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationLabel  = 'Kategori';
+    protected static ?string $navigationGroup = 'Master Data';
 
     public static function form(Form $form): Form
     {
@@ -34,15 +36,15 @@ class CategoryResource extends Resource
                         Card::make('Category')
                             ->schema([
                                 TextInput::make('name')->required()
-                                    ->live()
-                                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', str::slug($state))),
-                                // TextInput::make('name')
-                                //     ->reactive()
-                                //     ->afterStateUpdated(
-                                //         fn ($state, callable $set) =>
-                                //         $set('slug', Str::slug($state))
-                                //     ),
-                                TextInput::make('slug')->required(),
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(
+                                        fn (Set $set, ?string $state) =>
+                                        $set('slug', str::slug($state))
+                                    ),
+
+                                TextInput::make('slug')->required()
+                                    ->readOnly()
+                                    ->live(),
                             ])
                     ])
             ]);
@@ -89,6 +91,8 @@ class CategoryResource extends Resource
             'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
     }
+
+
     // public static function getEloquentQuery(): Builder
     // {
     //     $query = parent::getEloquentQuery();

@@ -26,7 +26,7 @@ class Team extends Model
     }
     public function categories(): HasMany
     {
-        return $this->HasMany(DataAlamat::class);
+        return $this->HasMany(Category::class);
     }
 
     public function role(): HasMany
@@ -34,8 +34,10 @@ class Team extends Model
         return $this->HasMany(Role::class);
     }
 
-    // public function roles(): HasMany
-    // {
-    //     return $this->hasMany(Role::class);
-    // }
+
+
+    public function produk(): HasMany
+    {
+        return $this->HasMany(Product::class);
+    }
 }

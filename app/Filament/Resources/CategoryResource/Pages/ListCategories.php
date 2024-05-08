@@ -5,6 +5,7 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ListCategories extends ListRecords
 {
@@ -15,5 +16,10 @@ class ListCategories extends ListRecords
         return [
             Actions\CreateAction::make(),
         ];
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return "Kategori " . auth()->user()->roles->pluck('name')->first();
     }
 }

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\DataAlamatResource\Pages;
 use App\Filament\Resources\DataAlamatResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ListDataAlamats extends ListRecords
 {
@@ -15,5 +16,9 @@ class ListDataAlamats extends ListRecords
         return [
             Actions\CreateAction::make(),
         ];
+    }
+    public function getTitle(): string|Htmlable
+    {
+        return "Data dan Alamat";
     }
 }

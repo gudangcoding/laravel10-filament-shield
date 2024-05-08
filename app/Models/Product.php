@@ -31,4 +31,9 @@ class Product extends Model
     {
         return $this->belongsTo(\App\Models\Team::class);
     }
+
+    public function ProductVariant()
+    {
+        return $this->hasMany(\App\Models\ProductVariant::class);
+    }
 }
