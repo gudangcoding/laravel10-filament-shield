@@ -43,41 +43,69 @@ class SalesOrderResource extends Resource
     {
         return $form
             ->schema([
-
-                Card::make('Order')
-                    ->schema([
-                        TextInput::make('customer_name')->label('Customer Name')->required(),
-                        TextInput::make('order_number')->label('Order Number')->required(),
-                        DateTimePicker::make('order_date')->label('Order Date')->required(),
-                        TextInput::make('total_amount')->label('Total Amount')->required(),
-                        Select::make('status')->label('Status')->options([
-                            'Pending' => 'Pending',
-                            'Processing' => 'Processing',
-                            'Completed' => 'Completed',
-                        ])->required(),
+                Section::make('')
+                    ->columns([
+                        'sm' => 6,
+                        'xl' => 6,
+                        '2xl' => 8,
                     ])
-                    ->columns(3),
+                    ->schema([
+                        Card::make('Detail Pelanggan')
+                            ->columnSpan([
+                                'md' => 4,
+                            ])
+                            ->schema([
+                                TextInput::make('customer_name')
+                                    ->label('Customer Name')
+                                    ->required(),
+                                TextInput::make('order_number')->label('Order Number')->required(),
+                                TextInput::make('total_amount')->label('Total Amount')->required(),
+                                Select::make('status')->label('Status')->options([
+                                    'Pending' => 'Pending',
+                                    'Processing' => 'Processing',
+                                    'Completed' => 'Completed',
+                                ])->required(),
+                            ])
+                            ->columns(2),
+
+                        Card::make('Akumulasi Belanja')
+                            ->columnSpan([
+                                'md' => 2,
+                            ])
+                            ->schema([
+                                TextInput::make('total_amount')
+                                    ->label('Total')
+                                    ->disabled(),
+                                TextInput::make('dp')->label('DP')->required(),
+                                TextInput::make('sisa')->label('Sisa')->required(),
+                            ])
+                            ->columns(1),
+                    ]),
+
+
                 Card::make('Order Details')
                     ->schema([
                         Repeater::make('order_details')
                             ->schema([
                                 Grid::make('')
                                     ->schema([
+
                                         Select::make('product_id')
-                                            ->label('Product Name')
-                                            ->live()
-                                            ->options(Product::pluck('name', 'id')->toArray())
-                                            ->afterStateUpdated(function ($state, callable $set) {
-                                                // Pastikan $state adalah array dan memiliki kunci 'product_id'
-                                                if (is_array($state) && isset($state['product_id'])) {
-                                                    $productId = $state['product_id'];
-                                                    $product = ProductVariant::findOrFail($productId);
-                                                    if ($product) {
-                                                        $set('harga', $product->price);
-                                                    }
-                                                }
+                                            ->label('Product')
+                                            ->options(Product::query()->pluck('name', 'id'))
+                                            ->required()
+                                            ->reactive()
+                                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                                $productVariant = ProductVariant::where('product_id', $state)->first();
+                                                $harga = $productVariant ? $productVariant->harga : 0;
+                                                $set('harga', $harga);
                                             })
-                                            ->required(),
+                                            ->distinct()
+                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                            ->columnSpan([
+                                                'md' => 1,
+                                            ])
+                                            ->searchable(),
 
                                         TextInput::make('qty')
                                             ->label('Quantity')
@@ -89,13 +117,18 @@ class SalesOrderResource extends Resource
                                             ->label('Unit Price')
                                             ->required(),
                                         TextInput::make('subtotal')
+                                            ->live()
                                             ->columnSpan(1)
                                             ->label('Subtotal')
-                                        // ->default(function ($data) {
-                                        //     return (string)($data->qty * $data->harga);
-                                        // })
-                                        // ->default(fn ($state) => $state->qty * $state->harga)
-                                        // ->disabled(),
+
+                                            ->default(function () {
+                                                // $harga = TextInput::make('harga') ?? 0;
+                                                $harga = session('harga') ?? 0;
+                                                $qty = session('qty') ?? 1;
+                                                return $harga * $qty;
+                                            })
+                                            ->disabled(),
+
                                     ])->columns(4),
                             ])
                             ->addActionLabel('Tambah'),
