@@ -38,8 +38,10 @@ return [
     ],
 
     'panel_user' => [
-        'enabled' => true,
+        'enabled' => false,
         'name' => 'panel_user',
+        'navigation' => false,
+        'hide_navigation' => true, // Menyembunyikan navigasi roles
     ],
 
     'permission_prefixes' => [
@@ -90,7 +92,7 @@ return [
     ],
 
     'discovery' => [
-        'discover_all_resources' => false,
+        'discover_all_resources' => true,
         'discover_all_widgets' => false,
         'discover_all_pages' => false,
     ],

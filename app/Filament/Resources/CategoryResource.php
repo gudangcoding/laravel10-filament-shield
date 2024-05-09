@@ -7,6 +7,7 @@ use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -18,6 +19,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryResource extends Resource
 {
@@ -25,13 +27,24 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationLabel  = 'Kategori';
+    protected static ?string $recordTitleAttribute = 'name'; //untuk global search
     protected static ?string $navigationGroup = 'Master Data';
     public static function getNavigationBadge(): ?string
     {
-        return Category::count();
+        $user = Auth::user();
+        $userId = $user->id;
+        return Category::where('user_id', $userId)->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getModel()::count() > 10 ? 'danger' : 'primary';
     }
     public static function form(Form $form): Form
     {
+        $user = Auth::user();
+        $userId = $user->id;
+
         return $form
             ->schema([
                 Section::make('Form Category')
@@ -48,6 +61,8 @@ class CategoryResource extends Resource
                                 TextInput::make('slug')->required()
                                     ->readOnly()
                                     ->live(),
+                                Hidden::make('user_id')->default($userId),
+
                             ])
                     ])
             ]);
@@ -55,7 +70,18 @@ class CategoryResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $user = Auth::user();
+        $userId = $user->id;
         return $table
+
+            // menampilkan data berdasarkan id yang login
+            ->modifyQueryUsing(function (Builder $query) use ($userId) {
+                // filter jika bukan super_admin
+                if (!auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
+                    $query->where('user_id', $userId);
+                }
+            })
+
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama')

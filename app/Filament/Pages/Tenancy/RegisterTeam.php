@@ -3,10 +3,12 @@
 namespace App\Filament\Pages\Tenancy;
 
 use App\Models\Team;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Pages\Tenancy\RegisterTenant;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class RegisterTeam extends RegisterTenant
@@ -18,6 +20,8 @@ class RegisterTeam extends RegisterTenant
 
     public function form(Form $form): Form
     {
+        // $user = Auth::user();
+        // $userId = $user->id;
         return $form
             ->schema([
                 TextInput::make('name')
@@ -27,6 +31,7 @@ class RegisterTeam extends RegisterTenant
                         $set('slug', str::slug($state))
                     ),
                 TextInput::make('slug'),
+                // Hidden::make('user_id')->default($userId),
                 // ...
             ]);
     }

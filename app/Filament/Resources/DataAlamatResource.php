@@ -22,6 +22,7 @@ class DataAlamatResource extends Resource
     protected static ?string $model = DataAlamat::class;
     protected static ?string $tenantRelationshipName = 'dataalamat';
     protected static ?string $navigationLabel  = 'Data Alamat';
+    protected static ?string $recordTitleAttribute = 'nama'; //untuk global search
     protected static ?string $navigationGroup = 'Master Data';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';

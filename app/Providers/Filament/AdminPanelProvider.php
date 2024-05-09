@@ -21,22 +21,27 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Spatie\Permission\Traits\HasRoles;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Plugin;
 
 class AdminPanelProvider extends PanelProvider
 {
 
     public function panel(Panel $panel): Panel
     {
+        $rolePlugin = \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make();
 
-        // $role_name = auth()->user()->roles->pluck('name')->first();
-        // $tampil = $role_name ? 'super_admin' || 'admin' : \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make();
-        // $tampil = ($role_name === 'super_admin' || $role_name === 'admin') ? \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make() : null;
+        if (!auth()->check() || !auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
+            $rolePlugin = null;
+        }
 
         return $panel
             ->default()
             ->id('admin')
             ->path('admin')
             ->login()
+            ->registration()
+            ->profile()
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -64,11 +69,16 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+
+
             ])
             ->plugins([
-                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+                $rolePlugin ?? new FilamentShieldPlugin,
             ])
             ->tenant(Team::class, ownershipRelationship: 'team', slugAttribute: 'slug')
+            ->tenantMenu(
+                // auth()->user()->hasAnyRole === 'super_admin' ? true : false,
+            )
             ->tenantRegistration(RegisterTeam::class)
             ->tenantProfile(EditTeamProfile::class)
             ->brandName('PT SAJ')

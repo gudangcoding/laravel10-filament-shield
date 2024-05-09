@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SalesOrderResource\Pages;
 use App\Filament\Resources\SalesOrderResource\RelationManagers;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\SalesOrder;
 
 use Filament\Forms;
@@ -30,7 +31,7 @@ class SalesOrderResource extends Resource
     protected static ?string $model = SalesOrder::class;
     protected static ?string $navigationLabel = 'Sales Order';
     protected static ?string $navigationGroup = 'Marketing';
-
+    // protected static ?string $recordTitleAttribute = 'customer_name'; //untuk global search
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     // protected static ?string $navigationGroup = 'Sales';
     public static function getNavigationBadge(): ?string
@@ -42,63 +43,66 @@ class SalesOrderResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Form Order')
+
+                Card::make('Order')
                     ->schema([
-                        Card::make('Order')
+                        TextInput::make('customer_name')->label('Customer Name')->required(),
+                        TextInput::make('order_number')->label('Order Number')->required(),
+                        DateTimePicker::make('order_date')->label('Order Date')->required(),
+                        TextInput::make('total_amount')->label('Total Amount')->required(),
+                        Select::make('status')->label('Status')->options([
+                            'Pending' => 'Pending',
+                            'Processing' => 'Processing',
+                            'Completed' => 'Completed',
+                        ])->required(),
+                    ])
+                    ->columns(3),
+                Card::make('Order Details')
+                    ->schema([
+                        Repeater::make('order_details')
                             ->schema([
-                                TextInput::make('customer_name')->label('Customer Name')->required(),
-                                TextInput::make('order_number')->label('Order Number')->required(),
-                                DateTimePicker::make('order_date')->label('Order Date')->required(),
-                                TextInput::make('total_amount')->label('Total Amount')->required(),
-                                Select::make('status')->label('Status')->options([
-                                    'Pending' => 'Pending',
-                                    'Processing' => 'Processing',
-                                    'Completed' => 'Completed',
-                                ])->required(),
-                            ])
-                            ->columns(3),
-                        Card::make('Order Details')
-                            ->schema([
-                                Repeater::make('order_details')
+                                Grid::make('')
                                     ->schema([
-                                        Grid::make('')
-                                            ->schema([
-                                                Select::make('product_id')
-                                                    ->label('Product Name')
-                                                    ->options(Product::pluck('name', 'id')->toArray())
-                                                    // ->afterStateUpdated(function ($state, callable $set) {
-                                                    //     $product = Product::findOrFail($state->product_id);
-                                                    //     if ($product) {
-                                                    //         $set('unit_price', $product->price);
-                                                    //     }
-                                                    // })
-                                                    ->afterStateUpdated(function ($state, callable $set) {
-                                                        $product = Product::findOrFail($state->product_id);
-                                                        if ($product) {
-                                                            $set('harga', $product->price);
-                                                        }
-                                                    })
-                                                    ->required(),
-                                                TextInput::make('qty')
-                                                    ->label('Quantity')
-                                                    ->default(1)
-                                                    ->required(),
-                                                TextInput::make('harga')
-                                                    ->label('Unit Price')
-                                                    ->required(),
-                                                TextInput::make('subtotal')
-                                                    ->label('Subtotal')
-                                                    // ->default(function ($data) {
-                                                    //     return (string)($data->qty * $data->harga);
-                                                    // })
-                                                    // ->default(fn ($state) => $state->qty * $state->harga)
-                                                    // ->disabled(),
-                                            ])->columns(4),
-                                    ]),
+                                        Select::make('product_id')
+                                            ->label('Product Name')
+                                            ->live()
+                                            ->options(Product::pluck('name', 'id')->toArray())
+                                            ->afterStateUpdated(function ($state, callable $set) {
+                                                // Pastikan $state adalah array dan memiliki kunci 'product_id'
+                                                if (is_array($state) && isset($state['product_id'])) {
+                                                    $productId = $state['product_id'];
+                                                    $product = ProductVariant::findOrFail($productId);
+                                                    if ($product) {
+                                                        $set('harga', $product->price);
+                                                    }
+                                                }
+                                            })
+                                            ->required(),
 
+                                        TextInput::make('qty')
+                                            ->label('Quantity')
+                                            ->default(1)
+                                            ->required()
+                                            ->columnSpan(1),
+                                        TextInput::make('harga')
+                                            ->columnSpan(1)
+                                            ->label('Unit Price')
+                                            ->required(),
+                                        TextInput::make('subtotal')
+                                            ->columnSpan(1)
+                                            ->label('Subtotal')
+                                        // ->default(function ($data) {
+                                        //     return (string)($data->qty * $data->harga);
+                                        // })
+                                        // ->default(fn ($state) => $state->qty * $state->harga)
+                                        // ->disabled(),
+                                    ])->columns(4),
                             ])
+                            ->addActionLabel('Tambah'),
 
-                    ]),
+                    ])
+
+
 
 
 

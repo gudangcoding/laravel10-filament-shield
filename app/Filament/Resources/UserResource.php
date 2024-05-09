@@ -17,13 +17,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Traits\HasRoles;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
     protected static ?string $tenantRelationshipName = 'members';
     protected static ?string $navigationLabel = 'Pengguna';
+    protected static ?string $recordTitleAttribute = 'name'; //untuk global search
     public static function getNavigationGroup(): ?string
     {
         return 'Settings';
@@ -37,6 +40,8 @@ class UserResource extends Resource
     }
     public static function form(Form $form): Form
     {
+        $user = Auth::user();
+        $userId = $user->id;
         return $form
             ->schema([
                 Section::make('Form User')
@@ -57,8 +62,10 @@ class UserResource extends Resource
                                     ->dehydrateStateUsing(fn ($state) => Hash::make($state)),
 
 
-                                Select::make('roles')->multiple()->relationship('roles', 'name')
-
+                                // Select::make('roles')->multiple()->relationship('roles', 'name')
+                                Forms\Components\CheckboxList::make('roles')
+                                    ->relationship('roles', 'name')
+                                    ->searchable()
                             ])->columns(2)
                     ]),
             ]);
@@ -66,7 +73,15 @@ class UserResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $user = Auth::user();
+        $userId = $user->id;
         return $table
+            ->modifyQueryUsing(function (Builder $query) use ($userId) {
+                // filter jika bukan super_admin
+                if (!auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
+                    $query->where('user_id', $userId);
+                }
+            })
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('email'),

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Filament\Resources\ProductResource\RelationManagers\ProductVariantRelationManager;
+use App\Filament\Resources\ProductResource\Widgets\ProductOverview;
 use App\Models\Category;
 use App\Models\Product;
 use Filament\Facades\Filament;
@@ -36,7 +37,7 @@ class ProductResource extends Resource
     // protected static ?string $tenantOwnershipRelationshipName = 'products';
     protected static ?string $tenantRelationshipName = 'produk';
     protected static ?string $navigationLabel = 'Produk';
-
+    protected static ?string $recordTitleAttribute = 'name'; //untuk global search
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Master Data';
     public static function getNavigationBadge(): ?string
@@ -126,6 +127,13 @@ class ProductResource extends Resource
             'index' => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            ProductOverview::class,
         ];
     }
 }
