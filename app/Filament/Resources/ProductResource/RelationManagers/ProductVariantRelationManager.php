@@ -12,6 +12,9 @@ use GuzzleHttp\Psr7\UploadedFile;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Filament\Forms\ComponentContainer;
+use Filament\Tables\Columns\ImageColumn;
 
 class ProductVariantRelationManager extends RelationManager
 {
@@ -23,30 +26,26 @@ class ProductVariantRelationManager extends RelationManager
 
         return $form
             ->schema([
+                FileUpload::make('gambar')
+                    ->directory('product'),
 
-                // FileUpload::make('gambar'),
-                FileUpload::make('gambar')
-                    ->label('Upload Gambar')
-                    ->placeholder('Pilih file')
-                    // ->helpMessage('Pilih gambar yang ingin diupload')
-                    ->rules(['image', 'max:2048']) // Aturan validasi: file gambar, maksimal 2MB
-                    ->store(function (FileUpload $file) {
-                        return $file->store('product', 'product_images'); // Simpan file di direktori storage/app/public/product
-                    }),
-                FileUpload::make('gambar')
-                    ->label('Upload Gambar')
-                    ->placeholder('Pilih file')
-                    ->helpMessage('Pilih gambar yang ingin diupload')
-                    ->rules(['image', 'max:2048']) // Aturan validasi: file gambar, maksimal 2MB
-                    ->store(function (FileUpload $file) {
-                        return Storage::disk('product_images')->put('product', $file->store()); // Simpan file di direktori storage/app/public/product
-                    }),
+                Forms\Components\Select::make('satuan')
+                    ->label('Satuan')
+                    ->options([
+                        'Ctn' => 'Carton',
+                        'Box' => 'Box',
+                        'Card' => 'Card',
+                        'Pcs' => 'Piece',
+                    ])
+                    ->required(),
+
                 Forms\Components\TextInput::make('harga')
                     ->label('Harga')
                     ->required(),
-                Forms\Components\TextInput::make('satuan')
-                    ->label('Satuan')
-                    ->required(),
+                Forms\Components\TextInput::make('ukuran_kemasan')
+                    ->label('Ukuran Kemasan')
+                    ->helperText('PanjangxLebarxTinggi'),
+                // ->required(),
                 Forms\Components\TextInput::make('isi')
                     ->label('Isi')
                     ->required(),
@@ -61,9 +60,9 @@ class ProductVariantRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('product_id')
             ->columns([
-                Tables\Columns\TextColumn::make('gambar'),
-                Tables\Columns\TextColumn::make('harga'),
                 Tables\Columns\TextColumn::make('satuan'),
+                ImageColumn::make('gambar'),
+                Tables\Columns\TextColumn::make('harga'),
                 Tables\Columns\TextColumn::make('isi'),
                 Tables\Columns\TextColumn::make('stok'),
             ])

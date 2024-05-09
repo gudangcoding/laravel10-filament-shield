@@ -20,6 +20,6 @@ class ListCategories extends ListRecords
 
     public function getTitle(): string|Htmlable
     {
-        return "Kategori " . auth()->user()->roles->pluck('name')->first();
+        return "Kategori "; //. auth()->user()->roles->pluck('name')->first();
     }
 }

@@ -17,8 +17,9 @@ class ListDataAlamats extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
     public function getTitle(): string|Htmlable
     {
-        return "Data dan Alamat";
+        return "Data dan Alamat " . auth()->user()->roles->pluck('name')->first();
     }
 }

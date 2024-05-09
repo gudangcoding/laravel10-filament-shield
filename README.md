@@ -89,4 +89,15 @@ tambahkan ini pada Spatie\Permission\Models\Role<br>
         return $this->belongsTo(\App\Models\Team::class);<br>
     }<br>
 </li>
+<li>
+Tambahkan ini di .env untuk upload file<br>
+<pre>FILESYSTEM_DRIVER=local</pre>
+</li>
+<li>
+    Setting faker ke bahasa indonesia<br>
+    Setting di env<br>
+    <pre>FAKER_LOCALE=id_ID</pre>
+    Setting di config/app.php<br>
+    <pre>'faker_locale' => env('FAKER_LOCALE', 'en_US'),</pre>
+</li>
 </ol>

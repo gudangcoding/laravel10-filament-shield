@@ -49,7 +49,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                // Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -70,6 +70,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->tenant(Team::class, ownershipRelationship: 'team', slugAttribute: 'slug')
             ->tenantRegistration(RegisterTeam::class)
-            ->tenantProfile(EditTeamProfile::class);
+            ->tenantProfile(EditTeamProfile::class)
+            ->brandName('PT SAJ')
+            // ->brandLogo(fn () => view('filament.admin.logo'))
+            // ->brandLogo(asset('images/logo.svg'))
+        ;
     }
 }

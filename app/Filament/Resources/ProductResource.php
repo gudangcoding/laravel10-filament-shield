@@ -39,6 +39,10 @@ class ProductResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Master Data';
+    public static function getNavigationBadge(): ?string
+    {
+        return Product::count();
+    }
     public static function form(Form $form): Form
     {
         $user = Auth::user();
@@ -53,7 +57,8 @@ class ProductResource extends Resource
                     ->schema([
                         Card::make()
                             ->schema([
-
+                                FileUpload::make('gambar')
+                                    ->directory('product'),
                                 TextInput::make('name')
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(
@@ -68,10 +73,14 @@ class ProductResource extends Resource
                                     ->options(Category::pluck('name', 'id')->toArray())
                                     ->default($form->getRecord()->category_id ?? null),
                                 TextInput::make('deskripsi')->label('Deskripsi'),
+                                TextInput::make('format_satuan')
+                                    ->label('Format Satuan')
+                                    ->default('Ctn/Box/Card/Pcs')
+                                    ->helperText('COntoh : Ctn/Box/Card/Pcs'),
+
                                 Hidden::make('team_id')->default($teamId),
                                 Hidden::make('user_id')->default($user->id)
                             ])->columns(2),
-
 
                     ]),
             ]);
@@ -85,12 +94,10 @@ class ProductResource extends Resource
                     ->label('Nama')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('categories.name')
+                Tables\Columns\TextColumn::make('category.name')
                     ->label('Kategori')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('deskripsi')
-                    ->label('Deskripsi')
-                    ->sortable(),
+
 
             ])
             ->filters([

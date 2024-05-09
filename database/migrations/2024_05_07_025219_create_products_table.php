@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('category_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->string('gambar')->nullable();
             $table->string('name');
+            $table->string('format_satuan');
             $table->string('slug')->nullable();
             $table->string('deskripsi')->nullable();
             $table->timestamps();
@@ -26,10 +28,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('gambar')->nullable();
-            $table->string('harga')->nullable();
+            $table->integer('harga')->nullable();
             $table->string('satuan')->nullable();
-            $table->string('isi')->nullable();
-            $table->string('stok');
+            $table->string('ukuran_kemasan')->nullable();
+            $table->integer('isi')->nullable();
+            $table->integer('stok');
             $table->timestamps();
         });
     }

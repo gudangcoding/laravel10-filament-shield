@@ -33,6 +33,11 @@ class SalesOrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     // protected static ?string $navigationGroup = 'Sales';
+    public static function getNavigationBadge(): ?string
+    {
+        return SalesOrder::count();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -61,12 +66,36 @@ class SalesOrderResource extends Resource
                                                 Select::make('product_id')
                                                     ->label('Product Name')
                                                     ->options(Product::pluck('name', 'id')->toArray())
+                                                    // ->afterStateUpdated(function ($state, callable $set) {
+                                                    //     $product = Product::findOrFail($state->product_id);
+                                                    //     if ($product) {
+                                                    //         $set('unit_price', $product->price);
+                                                    //     }
+                                                    // })
+                                                    ->afterStateUpdated(function ($state, callable $set) {
+                                                        $product = Product::findOrFail($state->product_id);
+                                                        if ($product) {
+                                                            $set('harga', $product->price);
+                                                        }
+                                                    })
                                                     ->required(),
-                                                TextInput::make('quantity')->label('Quantity')->required(),
-                                                TextInput::make('unit_price')->label('Unit Price')->required(),
-                                                TextInput::make('subtotal')->label('Subtotal')->disabled(),
+                                                TextInput::make('qty')
+                                                    ->label('Quantity')
+                                                    ->default(1)
+                                                    ->required(),
+                                                TextInput::make('harga')
+                                                    ->label('Unit Price')
+                                                    ->required(),
+                                                TextInput::make('subtotal')
+                                                    ->label('Subtotal')
+                                                    // ->default(function ($data) {
+                                                    //     return (string)($data->qty * $data->harga);
+                                                    // })
+                                                    // ->default(fn ($state) => $state->qty * $state->harga)
+                                                    // ->disabled(),
                                             ])->columns(4),
                                     ]),
+
                             ])
 
                     ]),
