@@ -1,4 +1,5 @@
 <h1>Langkah Langkah filament panel multi tenant dan shield</h1>
+<img src='pos1.png'><br>
 <ol>
     <li><pre>composer create-project laravel/laravel:^10.0 nama_proyek</pre></li>
     <li><pre>composer require filament/filament:"^3.2" -W</pre></li>
