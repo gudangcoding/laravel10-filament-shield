@@ -40,4 +40,8 @@ class Team extends Model
     {
         return $this->HasMany(Product::class);
     }
+    public function invoice(): HasMany
+    {
+        return $this->HasMany(Invoice::class);
+    }
 }

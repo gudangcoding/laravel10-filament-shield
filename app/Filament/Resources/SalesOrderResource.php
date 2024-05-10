@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SalesOrderResource\Pages;
 use App\Filament\Resources\SalesOrderResource\RelationManagers;
+use App\Models\DataAlamat;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\SalesOrder;
@@ -12,6 +13,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -19,6 +21,7 @@ use Filament\Forms\Components\TextInput;
 
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -27,10 +30,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Resources\Forms\Components;
 use Filament\Tables\Columns\Summarizers\Sum;
+use Livewire\Attributes\Reactive;
+use NunoMaduro\Collision\Adapters\Phpunit\State;
 
 class SalesOrderResource extends Resource
 {
     protected static ?string $model = SalesOrder::class;
+    protected static ?string $tenantRelationshipName = 'invoice';
     protected static ?string $navigationLabel = 'Sales Order';
     protected static ?string $navigationGroup = 'Marketing';
     // protected static ?string $recordTitleAttribute = 'customer_name'; //untuk global search
@@ -57,11 +63,32 @@ class SalesOrderResource extends Resource
                                 'md' => 4,
                             ])
                             ->schema([
-                                TextInput::make('customer_name')
-                                    ->label('Customer Name')
-                                    ->required(),
-                                TextInput::make('order_number')->label('Order Number')->required(),
-                                TextInput::make('total_amount')->label('Total Amount')->required(),
+                                TextInput::make('order_number')
+                                    ->default('OR-' . random_int(100000, 999999))
+                                    ->readOnly(),
+                                Select::make('customer_id')
+                                    ->label('Customer')
+                                    ->options(DataAlamat::where('type', 'customer')->pluck('nama', 'id'))
+                                    ->required()
+
+                                    ->createOptionForm([
+                                        TextInput::make('nama')
+                                            ->required(),
+                                        TextInput::make('no_hp')
+                                            ->label('Nomor HP')
+                                            ->required(),
+                                        TextInput::make('alamat')
+                                            ->required(),
+                                        Select::make('type')
+                                            ->options([
+                                                'customer' => 'Customer',
+                                                'supplier' => 'Supplier',
+                                                'other' => 'Other'
+                                            ])
+                                            ->default('customer')
+                                            ->required(),
+                                    ]),
+
                                 Select::make('status')->label('Status')->options([
                                     'Baru' => 'Baru',
                                     'Pending' => 'Pending',
@@ -82,59 +109,18 @@ class SalesOrderResource extends Resource
                                 'md' => 2,
                             ])
                             ->schema([
-                                TextInput::make('total_amount')
-                                    ->label('Total')
-                                    //https://stackoverflow.com/questions/70765417/laravel-filament-sum-and-count-repeater
-                                    // ->default(function ($state, Forms\Set $set, Get $get) {
-                                    //     $orderDetails = $get('order_details.subtotal');
-                                    //     if ($orderDetails !== null) {
-                                    //         $total = $orderDetails->sum(function ($detail) {
-                                    //             return $detail['subtotal'] ?? 0;
-                                    //         });
-                                    //         return $total;
-                                    //     } else {
-                                    //         return 0;
-                                    //     }
-                                    // })
-                                    ->prefix('Rp')
-                                    // ->postfix('m²')
-                                    // ->default(function (Closure $get) {
-                                    //     $fields = $get('order_details');
-                                    //     $sum = 0;
-                                    //     foreach ($fields as $field) {
-                                    //         foreach ($field as $value) {
-                                    //             if ($value == "") {
-                                    //                 $value = 0;
-                                    //             }
-                                    //             $sum += $value;
-                                    //         }
-                                    //     }
-                                    //     return $sum;
-                                    // })
-                                    // ->placeholder(fn (Closure $get) => count($get('order_details.subtotal')))
-                                    // ->default(0)
 
-                                    ->default(function (Get $get) {
-                                        $fields = $get('order_details');
+                                Placeholder::make('amount')
+                                    ->content(function ($get) {
                                         $sum = 0;
-                                        if ($fields) {
-                                            foreach ($fields as $field) {
-                                                if (is_array($field) || is_object($field)) {
-                                                    foreach ($field as $value) {
-                                                        if ($value == "") {
-                                                            $value = 0;
-                                                        }
-                                                        $sum += $value;
-                                                    }
-                                                }
-                                            }
+                                        foreach ($get('order_details') as $product) {
+                                            $sum = $sum + ($product['harga'] * $product['qty']);
                                         }
                                         return $sum;
-                                    })
-
-                                    ->disabled(),
+                                    }),
                                 TextInput::make('dp')->label('DP')->required(),
                                 TextInput::make('sisa')->label('Sisa')->required(),
+                                TextInput::make('kembalian')->label('Kembalian')->required(),
                             ])
                             ->columns(1),
                     ]),
@@ -143,10 +129,10 @@ class SalesOrderResource extends Resource
                 Card::make('Order Details')
                     ->schema([
                         Repeater::make('order_details')
+
                             ->schema([
                                 Grid::make('')
                                     ->schema([
-
                                         Select::make('product_id')
                                             ->label('Product')
                                             ->options(Product::query()->pluck('name', 'id'))
@@ -170,6 +156,7 @@ class SalesOrderResource extends Resource
                                             ->columnSpan([
                                                 'md' => 1,
                                             ])
+
                                             ->searchable(),
 
                                         TextInput::make('qty')
@@ -189,7 +176,6 @@ class SalesOrderResource extends Resource
                                             ->label('Unit Price')
                                             ->required(),
                                         TextInput::make('subtotal')
-                                            ->postfix('Rp')
                                             ->numeric()
                                             ->reactive()
                                             ->columnSpan(1)
@@ -202,23 +188,18 @@ class SalesOrderResource extends Resource
                                                     $subttotal = 0;
                                                 }
 
-                                                return  $subttotal;
+                                                return  number_format($subttotal, 2, '.', '');
                                             })
-                                            ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
-                                                $subtotal = $state;
-                                                $totalAmount = $get('total_amount');
-                                                if ($subtotal != $totalAmount) {
-                                                    $set('total_amount', $subtotal);
-                                                }
-                                            })
+                                            ->disabled()
 
-                                            ->disabled(),
+                                    ])
+                                    ->columns(4)
 
-                                    ])->columns(4),
                             ])
                             ->addActionLabel('Tambah'),
 
                     ])
+
 
 
 

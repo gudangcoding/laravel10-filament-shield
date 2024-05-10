@@ -15,16 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->nullable(true);
             $table->foreignId('team_id')->constrained()->cascadeOnDelete()->nullable(true);
-            $table->string('nama');
+            $table->string('name');
             $table->string('type');
             $table->string('no_hp');
             $table->text('alamat');
-            $table->string('kelurahan')->nullable();
-            $table->string('kec')->nullable();
-            $table->string('kel')->nullable();
-            $table->string('kab')->nullable();
-            $table->string('prov')->nullable();
-            $table->string('kodepos')->nullable();
             $table->string('tipe')->nullable();
             $table->string('nama_bank')->nullable();
             $table->string('no_rekening')->nullable();

@@ -101,4 +101,8 @@ Tambahkan ini di .env untuk upload file<br>
     Setting di config/app.php<br>
     <pre>'faker_locale' => env('FAKER_LOCALE', 'en_US'),</pre>
 </li>
+<li>
+    //https://stackoverflow.com/questions/70765417/laravel-filament-sum-and-count-repeater<br>
+    //https://laraveldaily.com/post/filament-repeater-live-calculations-on-update<br>
+</li>
 </ol>
