@@ -10,7 +10,9 @@ class InvoiceDetail extends Model
     use HasFactory;
 
     protected $fillable = [
-        // Pastikan untuk menambahkan semua kolom yang relevan
+        'invoice_id',
+        'total_qty',
+        'total_amount',
     ];
 
     /**

@@ -13,6 +13,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -111,7 +112,7 @@ class SalesOrderResource extends Resource
                             ])
                             ->schema([
 
-                                Placeholder::make('amount')
+                                Placeholder::make('amounts')
                                     ->label('Total Belanja')
                                     ->content(function ($get) {
                                         $sum = 0;
@@ -120,6 +121,7 @@ class SalesOrderResource extends Resource
                                         }
                                         return $sum;
                                     }),
+                                Hidden::make('amount'),
                                 TextInput::make('dp')->label('DP')->required(),
                                 TextInput::make('sisa')->label('Sisa')->required(),
                                 TextInput::make('kembalian')->label('Kembalian')->required(),
@@ -210,11 +212,9 @@ class SalesOrderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('customer_name')->label('Nama Pelanggan')->sortable(),
-                Tables\Columns\TextColumn::make('order_number')->label('Nomor Order')->sortable(),
-                Tables\Columns\TextColumn::make('order_date')->label('Tanggal Order')->date()->sortable(),
-                Tables\Columns\TextColumn::make('total_amount')->label('Jumlah Total')->sortable(),
-                Tables\Columns\TextColumn::make('status')->label('Status')->sortable(),
+                Tables\Columns\TextColumn::make('no_order')->label('Nama Pelanggan')->sortable(),
+                Tables\Columns\TextColumn::make('total_amount')->label('Jumlah Barang')->sortable(),
+                Tables\Columns\TextColumn::make('total_barang')->label('Total')->sortable(),
             ])
             ->filters([
                 //

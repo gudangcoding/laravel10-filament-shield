@@ -13,6 +13,7 @@ use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section as ComponentsSection;
@@ -27,18 +28,22 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Illuminate\Database\Eloquent\Factories\Relationship;
+use Illuminate\Support\Facades\Auth;
 
 class InvoiceResource extends Resource
 {
     protected static ?string $model = Invoice::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $tenantRelationshipName = 'invoice';
     protected static ?string $navigationGroup = 'Marketing';
     protected static ?int $navigationSort = 2;
     public static function form(Form $form): Form
     {
         $products = Product::get();
-
+        $user = Auth::user();
+        $userId = $user->id;
         return $form
             ->schema([
 
@@ -54,6 +59,7 @@ class InvoiceResource extends Resource
                                 'md' => 4,
                             ])
                             ->schema([
+                                Hidden::make('user_id')->default($userId),
                                 TextInput::make('order_number')
                                     ->default('INV-' . date('Ymd') . '-' . random_int(100000, 999999))
                                     ->unique()
@@ -129,7 +135,7 @@ class InvoiceResource extends Resource
                 Card::make('Detail Invoice')
                     ->schema([
                         Repeater::make('invoice_detail')
-
+                            ->relationship()
                             ->schema([
                                 Grid::make('')
                                     ->schema([

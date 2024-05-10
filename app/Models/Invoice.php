@@ -10,12 +10,27 @@ class Invoice extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'team_id',
+        'user_id',
+        'data_alamat_id',
+        'order_number',
+        'status',
+        'type_bayar',
+        'tanggal',
+        'tempo',
+        'total_amount',
+        'dp',
+        'sisa',
+        'kembali'
+    ];
 
     public function team(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Team::class);
     }
-    public function invoiceProducts()
+
+    public function invoice_detail()
     {
         return $this->hasMany(\App\Models\InvoiceDetail::class);
     }
