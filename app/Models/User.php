@@ -80,4 +80,10 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     {
         return $this->teams()->where('team_id', Filament::getTenant()->id);
     }
+
+    // public function roles(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(\Spatie\Permission\Models\Role::class, 'model_has_roles', 'model_id', 'role_id')
+    //         ->where('model_type', User::class);
+    // }
 }

@@ -62,10 +62,10 @@ class UserResource extends Resource
                                     ->dehydrateStateUsing(fn ($state) => Hash::make($state)),
 
 
-                                // Select::make('roles')->multiple()->relationship('roles', 'name')
-                                Forms\Components\CheckboxList::make('roles')
-                                    ->relationship('roles', 'name')
-                                    ->searchable()
+                                Select::make('roles')->multiple()->relationship('roles', 'name')
+                                // Forms\Components\CheckboxList::make('roles')
+                                //     ->relationship('roles', 'name')
+                                //     ->searchable()
                             ])->columns(2)
                     ]),
             ]);

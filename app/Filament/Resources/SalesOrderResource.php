@@ -18,6 +18,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -74,6 +75,11 @@ class SalesOrderResource extends Resource
                             ])
                             ->schema([
                                 TextInput::make('total_amount')
+                                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                        $orderDetails = $state->get('order_details');
+                                        $totalAmount = collect($orderDetails)->sum('subtotal');
+                                        $set('total_amount', $totalAmount);
+                                    })
                                     ->label('Total')
                                     ->disabled(),
                                 TextInput::make('dp')->label('DP')->required(),
@@ -94,11 +100,19 @@ class SalesOrderResource extends Resource
                                             ->label('Product')
                                             ->options(Product::query()->pluck('name', 'id'))
                                             ->required()
-                                            ->reactive()
-                                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
                                                 $productVariant = ProductVariant::where('product_id', $state)->first();
-                                                $harga = $productVariant ? $productVariant->harga : 0;
-                                                $set('harga', $harga);
+                                                if ($productVariant) {
+                                                    $harga = $productVariant->harga ?? 0;
+                                                    $subtotal = $get('qty') * $harga;
+                                                    $set('harga', $harga);
+                                                    $set('subtotal', $subtotal);
+                                                } else {
+
+                                                    $set('harga', 0);
+                                                    $set('subtotal', 0);
+                                                }
                                             })
                                             ->distinct()
                                             ->disableOptionsWhenSelectedInSiblingRepeaterItems()
@@ -110,6 +124,13 @@ class SalesOrderResource extends Resource
                                         TextInput::make('qty')
                                             ->label('Quantity')
                                             ->default(1)
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
+                                                $qty = $state;
+                                                $harga = $get('harga');
+                                                $subtotal = $harga * $qty;
+                                                $set('subtotal', $subtotal);
+                                            })
                                             ->required()
                                             ->columnSpan(1),
                                         TextInput::make('harga')
@@ -121,11 +142,13 @@ class SalesOrderResource extends Resource
                                             ->columnSpan(1)
                                             ->label('Subtotal')
 
-                                            ->default(function () {
-                                                // $harga = TextInput::make('harga') ?? 0;
-                                                $harga = session('harga') ?? 0;
-                                                $qty = session('qty') ?? 1;
-                                                return $harga * $qty;
+                                            ->default(function ($state, Forms\Set $set, Get $get) {
+                                                if ($get('qty') === '' && $get('harga')) {
+                                                    $subttotal = $get('qty') * $get('harga');
+                                                } else {
+                                                    $subttotal = 0;
+                                                }
+                                                return  $subttotal;
                                             })
                                             ->disabled(),
 
