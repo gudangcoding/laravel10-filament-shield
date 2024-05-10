@@ -7,7 +7,7 @@ use App\Filament\Resources\SalesOrderResource\RelationManagers;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\SalesOrder;
-
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
@@ -26,6 +26,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Resources\Forms\Components;
+use Filament\Tables\Columns\Summarizers\Sum;
 
 class SalesOrderResource extends Resource
 {
@@ -62,9 +63,16 @@ class SalesOrderResource extends Resource
                                 TextInput::make('order_number')->label('Order Number')->required(),
                                 TextInput::make('total_amount')->label('Total Amount')->required(),
                                 Select::make('status')->label('Status')->options([
+                                    'Baru' => 'Baru',
                                     'Pending' => 'Pending',
-                                    'Processing' => 'Processing',
+                                    'Diproses' => 'Diproses',
                                     'Completed' => 'Completed',
+                                ])->required(),
+                                Select::make('type_bayar')->label('Tipe Pembayaran')->options([
+                                    'Cash Langsung' => 'Cash Langsung',
+                                    'Cash Tempo' => 'Cash Tempo',
+                                    'Tempo Langsung' => 'Tempo Langsung',
+                                    'Cek Customer' => 'Cek Customer',
                                 ])->required(),
                             ])
                             ->columns(2),
@@ -75,12 +83,55 @@ class SalesOrderResource extends Resource
                             ])
                             ->schema([
                                 TextInput::make('total_amount')
-                                    ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                        $orderDetails = $state->get('order_details');
-                                        $totalAmount = collect($orderDetails)->sum('subtotal');
-                                        $set('total_amount', $totalAmount);
-                                    })
                                     ->label('Total')
+                                    //https://stackoverflow.com/questions/70765417/laravel-filament-sum-and-count-repeater
+                                    // ->default(function ($state, Forms\Set $set, Get $get) {
+                                    //     $orderDetails = $get('order_details.subtotal');
+                                    //     if ($orderDetails !== null) {
+                                    //         $total = $orderDetails->sum(function ($detail) {
+                                    //             return $detail['subtotal'] ?? 0;
+                                    //         });
+                                    //         return $total;
+                                    //     } else {
+                                    //         return 0;
+                                    //     }
+                                    // })
+                                    ->prefix('Rp')
+                                    // ->postfix('m²')
+                                    // ->default(function (Closure $get) {
+                                    //     $fields = $get('order_details');
+                                    //     $sum = 0;
+                                    //     foreach ($fields as $field) {
+                                    //         foreach ($field as $value) {
+                                    //             if ($value == "") {
+                                    //                 $value = 0;
+                                    //             }
+                                    //             $sum += $value;
+                                    //         }
+                                    //     }
+                                    //     return $sum;
+                                    // })
+                                    // ->placeholder(fn (Closure $get) => count($get('order_details.subtotal')))
+                                    // ->default(0)
+
+                                    ->default(function (Get $get) {
+                                        $fields = $get('order_details');
+                                        $sum = 0;
+                                        if ($fields) {
+                                            foreach ($fields as $field) {
+                                                if (is_array($field) || is_object($field)) {
+                                                    foreach ($field as $value) {
+                                                        if ($value == "") {
+                                                            $value = 0;
+                                                        }
+                                                        $sum += $value;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        return $sum;
+                                    })
+
                                     ->disabled(),
                                 TextInput::make('dp')->label('DP')->required(),
                                 TextInput::make('sisa')->label('Sisa')->required(),
@@ -138,18 +189,29 @@ class SalesOrderResource extends Resource
                                             ->label('Unit Price')
                                             ->required(),
                                         TextInput::make('subtotal')
-                                            ->live()
+                                            ->postfix('Rp')
+                                            ->numeric()
+                                            ->reactive()
                                             ->columnSpan(1)
                                             ->label('Subtotal')
-
+                                            ->numeric()
                                             ->default(function ($state, Forms\Set $set, Get $get) {
                                                 if ($get('qty') === '' && $get('harga')) {
                                                     $subttotal = $get('qty') * $get('harga');
                                                 } else {
                                                     $subttotal = 0;
                                                 }
+
                                                 return  $subttotal;
                                             })
+                                            ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
+                                                $subtotal = $state;
+                                                $totalAmount = $get('total_amount');
+                                                if ($subtotal != $totalAmount) {
+                                                    $set('total_amount', $subtotal);
+                                                }
+                                            })
+
                                             ->disabled(),
 
                                     ])->columns(4),
