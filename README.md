@@ -109,4 +109,48 @@ Tambahkan ini di .env untuk upload file<br>
 https://forum.aapanel.com/d/18317-aapanel-linux-panel-6834-installation-tutorial<br>
 https://www.rosehosting.com/blog/how-to-install-aapanel-on-debian-11/
 </li>
+<li>
+Prerequisites
+A server with Debian 11 as OS
+User privileges: root or non-root user with sudo privileges
+Step 1. Update the System
+Update the system packages to the latest versions available. Execute the following command:
+
+sudo apt-get update -y && sudo apt-get upgrade -y
+Step 2. Download aaPanel script
+To download and set the aaPanel script executable, use the following commands:
+
+wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh
+
+sudo chmod +x install.sh
+Step 3. Install aaPanel
+To install the aaPanel execute the following command:
+
+sudo bash install.sh
+You will be asked if you want to install the aaPanel into the /www directory on your server:
+
++----------------------------------------------------------------------
+| aaPanel 6.x FOR CentOS/Ubuntu/Debian
++----------------------------------------------------------------------
+| Copyright © 2015-2099 BT-SOFT(http://www.aapanel.com) All rights reserved.
++----------------------------------------------------------------------
+| The WebPanel URL will be http://SERVER_IP:7800 when installed.
++----------------------------------------------------------------------
+
+Do you want to install aaPanel to the /www directory now?(y/n): Y
+Once you confirm, the installation will start and it will take up to 3 minutes. You will see the following output after successful installation:
+
+# Congratulations! Installed successfully!
+
+aaPanel Internet Address: https://YourServerIP:7800/64b21d3e
+aaPanel Internal Address: https://YourServerIP:7800/64b21d3e
+username: zjs6ojyz
+password: 7cf519ed
+Warning:
+If you cannot access the panel,
+release the following port (7800|888|80|443|20|21) in the security group
+==================================================================
+Time consumed: 2 Minute!
+
+</li>
 </ol>
