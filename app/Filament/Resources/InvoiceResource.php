@@ -4,11 +4,19 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\InvoiceResource\Pages;
 use App\Filament\Resources\InvoiceResource\RelationManagers;
+use App\Models\DataAlamat;
 use App\Models\Invoice;
 use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\SalesOrder;
 use Filament\Actions\Action;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section as ComponentsSection;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -17,6 +25,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 
 class InvoiceResource extends Resource
 {
@@ -24,86 +34,154 @@ class InvoiceResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Marketing';
-
+    protected static ?int $navigationSort = 2;
     public static function form(Form $form): Form
     {
         $products = Product::get();
 
         return $form
             ->schema([
-                Section::make()
-                    ->columns(1)
+
+                Section::make('')
+                    ->columns([
+                        'sm' => 6,
+                        'xl' => 6,
+                        '2xl' => 8,
+                    ])
                     ->schema([
-                        // Bidang ulang untuk barang faktur
-                        Forms\Components\Repeater::make('invoiceProducts')
-                            // Didefinisikan sebagai hubungan ke model InvoiceProduct
-                            ->relationship()
-                            ->schema([
-                                // Dua bidang dalam setiap baris: produk dan kuantitas
-                                Forms\Components\Select::make('product_id')
-                                    ->relationship('product', 'name')
-                                    // Pilihan adalah semua produk, tetapi kita telah memodifikasi tampilannya untuk menampilkan harga juga
-                                    ->options(
-                                        $products->mapWithKeys(function (Product $product) {
-                                            return [$product->id => sprintf('%s ($%s)', $product->name, $product->price)];
-                                        })
-                                    )
-                                    // Menonaktifkan opsi yang sudah dipilih di baris lain
-                                    ->disableOptionWhen(function ($value, $state, Get $get) {
-                                        return collect($get('../*.product_id'))
-                                            ->reject(fn ($id) => $id == $state)
-                                            ->filter()
-                                            ->contains($value);
-                                    })
-                                    ->required(),
-                                Forms\Components\TextInput::make('quantity')
-                                    ->integer()
-                                    ->default(1)
-                                    ->required()
+                        Card::make('Detail Pelanggan')
+                            ->columnSpan([
+                                'md' => 4,
                             ])
-                            // Bidang ulang ini langsung sehingga akan memicu pembaruan status pada setiap perubahan
-                            ->live()
-                            // Setelah menambahkan baris baru, kita perlu memperbarui total
-                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                self::updateTotals($get, $set);
-                            })
-                            // Setelah menghapus baris, kita perlu memperbarui total
-                            ->deleteAction(
-                                fn (Action $action) => $action->after(fn (Get $get, Set $set) => self::updateTotals($get, $set)),
-                            )
-                            // Menonaktifkan pengurutan ulang
-                            ->reorderable(false)
-                            ->columns(2)
+                            ->schema([
+                                TextInput::make('order_number')
+                                    ->default('INV-' . date('Ymd') . '-' . random_int(100000, 999999))
+                                    ->unique()
+                                    ->readOnly(),
+                                Select::make('customer_id')
+                                    ->label('Customer')
+                                    ->options(DataAlamat::where('tipe', 'customer')->pluck('name', 'id'))
+                                    ->required()
+
+                                    ->createOptionForm([
+                                        TextInput::make('name')
+                                            ->required(),
+                                        TextInput::make('no_hp')
+                                            ->label('Nomor HP')
+                                            ->required(),
+                                        TextInput::make('alamat')
+                                            ->required(),
+                                        Select::make('type')
+                                            ->options([
+                                                'customer' => 'Customer',
+                                                'supplier' => 'Supplier',
+                                                'other' => 'Other'
+                                            ])
+                                            ->default('customer')
+                                            ->required(),
+                                    ]),
+
+                                Select::make('status')->label('Status')->options([
+                                    'Baru' => 'Baru',
+                                    'Pending' => 'Pending',
+                                    'Diproses' => 'Diproses',
+                                    'Completed' => 'Completed',
+                                ])->required(),
+                                Select::make('type_bayar')->label('Tipe Pembayaran')->options([
+                                    'Cash Langsung' => 'Cash Langsung',
+                                    'Cash Tempo' => 'Cash Tempo',
+                                    'Tempo Langsung' => 'Tempo Langsung',
+                                    'Cek Customer' => 'Cek Customer',
+                                ])->required(),
+                            ])
+                            ->columns(2),
+
+                        Card::make('Akumulasi Invoice')
+                            ->columnSpan([
+                                'md' => 2,
+                            ])
+                            ->schema([
+
+                                Placeholder::make('amount')
+                                    ->label('Total Invoice')
+                                    ->content(function ($get) {
+                                        $sum = 0;
+                                        foreach ($get('invoice_detail') as $product) {
+                                            $sum = $sum + ($product['subtotal']);
+                                        }
+                                        return $sum;
+                                    }),
+                                TextInput::make('dp')
+                                    ->label('DP')
+                                    ->required(),
+                                TextInput::make('sisa')
+                                    ->label('Sisa')
+                                    ->required(),
+                                TextInput::make('Termin')
+                                    ->label('termin')
+                                    ->numeric()
+                                    ->required(),
+                            ])
+                            ->columns(1),
                     ]),
-                Section::make()
-                    ->columns(1)
-                    ->maxWidth('1/2')
+
+
+                Card::make('Detail Invoice')
                     ->schema([
-                        Forms\Components\TextInput::make('subtotal')
-                            ->numeric()
-                            // Hanya dibaca, karena ini dihitung
-                            ->readOnly()
-                            ->prefix('$')
-                            // Ini memungkinkan kita untuk menampilkan subtotal saat halaman edit dimuat
-                            ->afterStateHydrated(function (Get $get, Set $set) {
-                                self::updateTotals($get, $set);
-                            }),
-                        Forms\Components\TextInput::make('taxes')
-                            ->suffix('%')
-                            ->required()
-                            ->numeric()
-                            ->default(20)
-                            // Bidang langsung, karena kita perlu menghitung ulang total pada setiap perubahan
-                            ->live(true)
-                            // Ini memungkinkan kita untuk menampilkan subtotal saat halaman edit dimuat
-                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                self::updateTotals($get, $set);
-                            }),
-                        Forms\Components\TextInput::make('total')
-                            ->numeric()
-                            // Hanya dibaca, karena ini dihitung
-                            ->readOnly()
-                            ->prefix('$')
+                        Repeater::make('invoice_detail')
+
+                            ->schema([
+                                Grid::make('')
+                                    ->schema([
+                                        Select::make('product_id')
+                                            ->label('No Order')
+                                            ->options(SalesOrder::query()->pluck('id', 'id'))
+                                            ->required()
+                                            ->live(onBlur: true)
+
+                                            ->distinct()
+                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                            ->columnSpan([
+                                                'md' => 2,
+                                            ])
+
+                                            ->searchable(),
+
+                                        TextInput::make('qty')
+                                            ->label('Total Barang')
+                                            ->default(1)
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
+                                                $qty = $state;
+                                                $harga = $get('harga');
+                                                $subtotal = $harga * $qty;
+                                                $set('subtotal', $subtotal);
+                                            })
+                                            ->required()
+                                            ->columnSpan(1),
+                                        TextInput::make('subtotal')
+                                            ->numeric()
+                                            ->reactive()
+                                            ->columnSpan(1)
+                                            ->label('Invoice Amount')
+                                            ->numeric()
+                                            ->default(function ($state, Forms\Set $set, Get $get) {
+                                                if ($get('qty') === '' && $get('harga')) {
+                                                    $subttotal = $get('qty') * $get('harga');
+                                                } else {
+                                                    $subttotal = 0;
+                                                }
+
+                                                return  number_format($subttotal, 2, '.', '');
+                                            })
+                                            ->disabled()
+
+                                    ])
+                                    ->columns(4)
+
+                            ])
+                            ->addActionLabel('Tambah Order'),
+
                     ])
             ]);
     }
@@ -141,25 +219,5 @@ class InvoiceResource extends Resource
             'create' => Pages\CreateInvoice::route('/create'),
             'edit' => Pages\EditInvoice::route('/{record}/edit'),
         ];
-    }
-
-    public static function updateTotals(Get $get, Set $set): void
-    {
-        // Ambil semua produk yang dipilih dan hapus baris kosong
-        $selectedProducts = collect($get('invoiceProducts'))
-            ->filter(fn ($item) => !empty($item['product_id']) && !empty($item['quantity']));
-
-        // Ambil harga untuk semua produk yang dipilih
-        $prices = Product::find($selectedProducts
-            ->pluck('product_id'))->pluck('price', 'id');
-
-        // Hitung subtotal berdasarkan produk dan kuantitas yang dipilih
-        $subtotal = $selectedProducts->reduce(function ($subtotal, $product) use ($prices) {
-            return $subtotal + ($prices[$product['product_id']] * $product['quantity']);
-        }, 0);
-
-        // Perbarui status dengan nilai baru
-        $set('subtotal', number_format($subtotal, 2, '.', ''));
-        $set('total', number_format($subtotal + ($subtotal * ($get('taxes') / 100)), 2, '.', ''));
     }
 }

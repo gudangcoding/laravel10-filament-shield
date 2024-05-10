@@ -105,4 +105,8 @@ Tambahkan ini di .env untuk upload file<br>
     //https://stackoverflow.com/questions/70765417/laravel-filament-sum-and-count-repeater<br>
     //https://laraveldaily.com/post/filament-repeater-live-calculations-on-update<br>
 </li>
+<li>
+https://forum.aapanel.com/d/18317-aapanel-linux-panel-6834-installation-tutorial<br>
+https://www.rosehosting.com/blog/how-to-install-aapanel-on-debian-11/
+</li>
 </ol>

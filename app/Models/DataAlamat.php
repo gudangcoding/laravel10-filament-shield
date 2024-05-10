@@ -10,17 +10,11 @@ class DataAlamat extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'nama',
-        'type',
+        'user_id',
+        'name',
+        'tipe',
         'no_hp',
         'alamat',
-        'kelurahan',
-        'kec',
-        'kel',
-        'kab',
-        'prov',
-        'kodepos',
-        'tipe',
         'nama_bank',
         'no_rekening',
         'atas_nama',

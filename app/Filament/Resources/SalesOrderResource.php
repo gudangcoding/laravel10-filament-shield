@@ -38,6 +38,7 @@ class SalesOrderResource extends Resource
     protected static ?string $model = SalesOrder::class;
     protected static ?string $tenantRelationshipName = 'invoice';
     protected static ?string $navigationLabel = 'Sales Order';
+    protected static ?int $navigationSort = -1;
     protected static ?string $navigationGroup = 'Marketing';
     // protected static ?string $recordTitleAttribute = 'customer_name'; //untuk global search
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -63,16 +64,16 @@ class SalesOrderResource extends Resource
                                 'md' => 4,
                             ])
                             ->schema([
-                                TextInput::make('order_number')
+                                TextInput::make('no_order')
                                     ->default('OR-' . random_int(100000, 999999))
                                     ->readOnly(),
                                 Select::make('customer_id')
                                     ->label('Customer')
-                                    ->options(DataAlamat::where('type', 'customer')->pluck('nama', 'id'))
+                                    ->options(DataAlamat::where('tipe', 'customer')->pluck('name', 'id'))
                                     ->required()
 
                                     ->createOptionForm([
-                                        TextInput::make('nama')
+                                        TextInput::make('name')
                                             ->required(),
                                         TextInput::make('no_hp')
                                             ->label('Nomor HP')
@@ -111,6 +112,7 @@ class SalesOrderResource extends Resource
                             ->schema([
 
                                 Placeholder::make('amount')
+                                    ->label('Total Belanja')
                                     ->content(function ($get) {
                                         $sum = 0;
                                         foreach ($get('order_details') as $product) {
@@ -129,7 +131,8 @@ class SalesOrderResource extends Resource
                 Card::make('Order Details')
                     ->schema([
                         Repeater::make('order_details')
-
+                            ->relationship()
+                            // ->relationship('salesDetails')
                             ->schema([
                                 Grid::make('')
                                     ->schema([
@@ -196,14 +199,9 @@ class SalesOrderResource extends Resource
                                     ->columns(4)
 
                             ])
-                            ->addActionLabel('Tambah'),
+                            ->addActionLabel('Tambah Produk'),
 
                     ])
-
-
-
-
-
 
             ]);
     }

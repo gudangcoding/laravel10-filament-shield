@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->nullable(true);
             $table->foreignId('team_id')->constrained()->cascadeOnDelete()->nullable(true);
             $table->string('name');
-            $table->string('type');
             $table->string('no_hp');
             $table->text('alamat');
             $table->string('tipe')->nullable();

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('category_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('gambar')->nullable();
             $table->string('name');
-            $table->string('format_satuan');
+            $table->string('format_satuan')->nullable();
             $table->string('slug')->nullable();
             $table->string('deskripsi')->nullable();
             $table->timestamps();

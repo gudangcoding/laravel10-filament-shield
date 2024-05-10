@@ -48,9 +48,6 @@ class ProductResource extends Resource
     {
         $user = Auth::user();
         $teamId = Filament::getTenant()->id; //$user->currentTeam->id
-
-
-
         return $form
             ->schema([
                 Section::make('Product Form')

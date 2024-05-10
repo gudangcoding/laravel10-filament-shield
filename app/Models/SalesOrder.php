@@ -11,7 +11,13 @@ class SalesOrder extends Model
     use HasFactory;
 
     protected $fillable = [
-        'product_id', 'quantity', 'total_price'
+        'no_order',
+        'team_id',
+        'user_id',
+        'data_alamat_id',
+        'satuan_id',
+        'total_amount',
+        'total_barang',
     ];
 
     public function product()
@@ -22,5 +28,10 @@ class SalesOrder extends Model
     public function team(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Team::class);
+    }
+
+    public function order_details()
+    {
+        return $this->hasMany(\App\Models\SalesDetail::class);
     }
 }

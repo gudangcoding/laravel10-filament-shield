@@ -13,17 +13,18 @@ return new class extends Migration
     {
         Schema::create('sales_orders', function (Blueprint $table) {
             $table->id();
+            $table->string('no_order')->unique();
             $table->foreignId('team_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('data_alamat_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('product_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('satuan_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->decimal('harga', 8, 2)->nullable();
-            $table->integer('qty')->nullable();
+            $table->decimal('total_amount', 8, 2)->nullable();
+            $table->integer('total_barang')->nullable();
             $table->timestamps();
         });
         Schema::create('sales_detail', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('sales_order_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('satuan_id')->nullable()->constrained()->cascadeOnDelete();
             $table->decimal('harga', 8, 2)->nullable();

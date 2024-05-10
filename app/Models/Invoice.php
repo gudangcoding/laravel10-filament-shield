@@ -10,6 +10,7 @@ class Invoice extends Model
 {
     use HasFactory;
 
+
     public function team(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Team::class);
