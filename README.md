@@ -163,9 +163,15 @@ RewriteRule ^(.*)$ public/$1 [L]<br>
  </IfModule> <br>
 </li>
 <li>
-<h1>Install Composer</h1>
+<h1>Install Composer di VPS</h1>
 
 <pre>sudo -u www composer install</pre>
 
+</li>
+<li>
+<h1>Install Ekstensi PHP</h1>
+<p>
+    ke menu App Store-> PHP yang terinstall -> Install Extensions
+</p>
 </li>
 </ol>
