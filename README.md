@@ -162,4 +162,10 @@ RewriteEngine On<br>
 RewriteRule ^(.*)$ public/$1 [L]<br>
  </IfModule> <br>
 </li>
+<li>
+<h1>Install Composer</h1>
+
+<pre>sudo -u www composer install</pre>
+
+</li>
 </ol>
