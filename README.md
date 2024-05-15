@@ -102,13 +102,9 @@ Tambahkan ini di .env untuk upload file<br>
     <pre>'faker_locale' => env('FAKER_LOCALE', 'en_US'),</pre>
 </li>
 <li>
-    //https://stackoverflow.com/questions/70765417/laravel-filament-sum-and-count-repeater<br>
-    //https://laraveldaily.com/post/filament-repeater-live-calculations-on-update<br>
+    https://www.rosehosting.com/blog/how-to-install-aapanel-on-debian-11/<br>
 </li>
-<li>
-https://forum.aapanel.com/d/18317-aapanel-linux-panel-6834-installation-tutorial<br>
-https://www.rosehosting.com/blog/how-to-install-aapanel-on-debian-11/
-</li>
+
 <li>
 <p>Prerequisites
 A server with Debian 11 as OS
@@ -133,13 +129,13 @@ To install the aaPanel execute the following command:<br>
 
 You will be asked if you want to install the aaPanel into the /www directory on your server:<br>
 
-+----------------------------------------------------------------------
-| aaPanel 6.x FOR CentOS/Ubuntu/Debian
-+----------------------------------------------------------------------
-| Copyright © 2015-2099 BT-SOFT(http://www.aapanel.com) All rights reserved.
-+----------------------------------------------------------------------
-| The WebPanel URL will be http://SERVER_IP:7800 when installed.
-+----------------------------------------------------------------------
++----------------------------------------------------------------------<br>
+| aaPanel 6.x FOR CentOS/Ubuntu/Debian<br>
++----------------------------------------------------------------------<br>
+| Copyright © 2015-2099 BT-SOFT(http://www.aapanel.com) All rights reserved.<br>
++----------------------------------------------------------------------<br>
+| The WebPanel URL will be http://SERVER_IP:7800 when installed.<br>
++----------------------------------------------------------------------<br>
 
 <p>Do you want to install aaPanel to the /www directory now?(y/n): Y
 Once you confirm, the installation will start and it will take up to 3 minutes. You will see the following output after successful installation:</p>
