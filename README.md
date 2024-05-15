@@ -174,4 +174,10 @@ RewriteRule ^(.*)$ public/$1 [L]<br>
     ke menu App Store-> PHP yang terinstall -> Install Extensions
 </p>
 </li>
+<li>
+<h1>Terminal </h1>
+<p>
+    ke menu File -> terminal
+</p>
+</li>
 </ol>
