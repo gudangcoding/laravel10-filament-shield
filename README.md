@@ -106,6 +106,7 @@ Tambahkan ini di .env untuk upload file<br>
 </li>
 
 <li>
+<h1>Install Vps</h1>
 <p>Prerequisites
 A server with Debian 11 as OS
 User privileges: root or non-root user with sudo privileges
