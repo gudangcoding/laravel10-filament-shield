@@ -154,7 +154,8 @@ Time consumed: 2 Minute!<br>
 
 </li>
 <li>
-htacess untuk vps<br>
+htacess untuk vps agar tidak perlu mengakses folder public http://ip-vps/public menjadi http://ip-vps<br>
+Buat File htacess di root proyek dan tuliskan kode di bawah ini<br>
 <IfModule mod_rewrite.c><br>
 RewriteEngine On<br>
 RewriteRule ^(.*)$ public/$1 [L]<br>
