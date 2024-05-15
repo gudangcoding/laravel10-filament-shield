@@ -4,10 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SalesOrderResource\Pages;
 use App\Filament\Resources\SalesOrderResource\RelationManagers;
+use App\Filament\Resources\SalesOrderResource\RelationManagers\SalesDetailRelationManager;
 use App\Models\DataAlamat;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\SalesOrder;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
@@ -31,6 +33,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Resources\Forms\Components;
 use Filament\Tables\Columns\Summarizers\Sum;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
 use Livewire\Attributes\Reactive;
 use NunoMaduro\Collision\Adapters\Phpunit\State;
 
@@ -221,6 +225,17 @@ class SalesOrderResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('pdf')
+                    ->label('PDF')
+                    ->color('success')
+                    ->icon('heroicon-o-arrow-down-circle')
+                    ->action(function (Model $record) {
+                        return response()->streamDownload(function () use ($record) {
+                            echo Pdf::loadHtml(
+                                Blade::render('pdf', ['record' => $record])
+                            )->stream();
+                        }, $record->number . '.pdf');
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -232,7 +247,7 @@ class SalesOrderResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            SalesDetailRelationManager::class,
         ];
     }
 

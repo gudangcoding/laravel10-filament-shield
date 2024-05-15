@@ -35,7 +35,6 @@ class Team extends Model
     }
 
 
-
     public function produk(): HasMany
     {
         return $this->HasMany(Product::class);
@@ -43,5 +42,13 @@ class Team extends Model
     public function invoice(): HasMany
     {
         return $this->HasMany(Invoice::class);
+    }
+    public function mutasi_bank(): HasMany
+    {
+        return $this->HasMany(MutasiBank::class);
+    }
+    public function customers(): HasMany
+    {
+        return $this->HasMany(MutasiBank::class);
     }
 }

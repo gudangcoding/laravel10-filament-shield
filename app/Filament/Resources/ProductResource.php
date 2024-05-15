@@ -55,6 +55,7 @@ class ProductResource extends Resource
                     ->schema([
                         Card::make()
                             ->schema([
+
                                 FileUpload::make('gambar')
                                     ->directory('product'),
                                 TextInput::make('name')
@@ -86,7 +87,15 @@ class ProductResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $user = Auth::user();
+        $userId = $user->id;
         return $table
+            ->modifyQueryUsing(function (Builder $query) use ($userId) {
+                // filter jika bukan super_admin
+                if (!auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
+                    $query->where('user_id', $userId);
+                }
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama')
@@ -98,6 +107,7 @@ class ProductResource extends Resource
 
 
             ])
+
             ->filters([
                 //
             ])

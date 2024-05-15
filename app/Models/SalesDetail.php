@@ -20,6 +20,7 @@ class SalesDetail extends Model
 
     public function salesOrder()
     {
-        return $this->belongsTo(\App\Models\SalesOrder::class, 'sales_id');
+        // return $this->BelongsToMany(\App\Models\SalesOrder::class);
+        return $this->BelongsToMany(\App\Models\SalesOrder::class, 'sales_id');
     }
 }

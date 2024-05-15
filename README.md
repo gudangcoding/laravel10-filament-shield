@@ -153,4 +153,11 @@ release the following port (7800|888|80|443|20|21) in the security group
 Time consumed: 2 Minute!
 
 </li>
+<li>
+htacess untuk vps<br>
+<IfModule mod_rewrite.c><br>
+RewriteEngine On<br>
+RewriteRule ^(.*)$ public/$1 [L]<br>
+ </IfModule> <br>
+</li>
 </ol>

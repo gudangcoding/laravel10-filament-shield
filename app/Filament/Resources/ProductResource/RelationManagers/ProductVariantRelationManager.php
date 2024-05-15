@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Filament\Forms\ComponentContainer;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\ImageColumn;
 
 class ProductVariantRelationManager extends RelationManager
@@ -29,7 +32,7 @@ class ProductVariantRelationManager extends RelationManager
                 FileUpload::make('gambar')
                     ->directory('product'),
 
-                Forms\Components\Select::make('satuan')
+                Select::make('satuan')
                     ->label('Satuan')
                     ->options([
                         'Ctn' => 'Carton',
@@ -39,19 +42,28 @@ class ProductVariantRelationManager extends RelationManager
                     ])
                     ->required(),
 
-                Forms\Components\TextInput::make('harga')
+                TextInput::make('harga')
                     ->label('Harga')
                     ->required(),
-                Forms\Components\TextInput::make('ukuran_kemasan')
+                TextInput::make('ukuran_kemasan')
                     ->label('Ukuran Kemasan')
                     ->helperText('PanjangxLebarxTinggi'),
                 // ->required(),
-                Forms\Components\TextInput::make('isi')
+                TextInput::make('isi')
                     ->label('Isi')
                     ->required(),
-                Forms\Components\TextInput::make('stok')
+                TextInput::make('stok')
                     ->label('Stok')
                     ->required(),
+                // Placeholder::make('amounts')
+                //     ->label('Total Belanja')
+                //     ->content(function ($get) {
+                //         $sum = 0;
+                //         foreach ($get('order_details') as $product) {
+                //             $sum = $sum + ($product['harga'] * $product['qty']);
+                //         }
+                //         return $sum;
+                //     }),
             ]);
     }
 

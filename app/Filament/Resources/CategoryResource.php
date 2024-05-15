@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Hidden;
@@ -16,10 +17,13 @@ use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\CreateAction;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 
 class CategoryResource extends Resource
 {
@@ -73,7 +77,6 @@ class CategoryResource extends Resource
         $user = Auth::user();
         $userId = $user->id;
         return $table
-
             // menampilkan data berdasarkan id yang login
             ->modifyQueryUsing(function (Builder $query) use ($userId) {
                 // filter jika bukan super_admin
@@ -81,7 +84,6 @@ class CategoryResource extends Resource
                     $query->where('user_id', $userId);
                 }
             })
-
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama')
@@ -97,12 +99,34 @@ class CategoryResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('pdf')
+                    ->label('PDF')
+                    ->color('success')
+                    ->icon('heroicon-o-arrow-down-circle')
+                    ->action(function (Model $record) {
+                        return response()->streamDownload(function () use ($record) {
+                            echo Pdf::loadHtml(
+                                Blade::render('pdf', ['record' => $record])
+                            )->stream();
+                        }, $record->number . '.pdf');
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            // ->headerActions([
+            //     CreateAction::make('category')
+            //         ->label('Tambah Kategori')
+            //         ->form([
+            //             TextInput::make('title')
+            //                 ->required()
+            //                 ->maxLength(255),
+            //             // ...
+            //         ]),
+            // ])
+            ;
     }
 
     public static function getRelations(): array

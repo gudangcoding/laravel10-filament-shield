@@ -115,6 +115,7 @@ class AdminPanelProvider extends PanelProvider
             ->tenantRegistration(RegisterTeam::class)
             ->tenantProfile(EditTeamProfile::class)
             ->brandName('PT SAJ')
+            ->databaseNotifications()
             // ->databaseNotifications()
             // ->brandLogo(fn () => view('filament.admin.logo'))
             // ->brandLogo(asset('images/logo.svg'))

@@ -1,0 +1,40 @@
+SO
+form
+1. status ada di customer tipe pembayaran untuk identifikasi customer
+vip
+baru
+problem
+
+header
+SO
+Tanggal
+unit satuan
+diskon keseluruhan
+
+
+footer
+total amount
+diskon
+ongkir
+total global
+
+
+Produk
+uuid
+gambar
+No Produk
+Nama Produk (indo/china/english)
+harga kosongkan
+
+kondisinya user hanya bisa akses data sendiri dan data admin hanya bisa baca oleh user
+sesama user tidak bisa saling lihata data
+
+aktif/ no active
+
+SO
+tambah produk pakai popupf
+ada fitur tambah produk
+
+customer score untuk prioritas packing
+
+

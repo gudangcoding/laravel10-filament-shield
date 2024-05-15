@@ -189,6 +189,7 @@ return [
         App\Providers\Filament\AppPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
         AppPanelProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
     ],
 
@@ -205,6 +206,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ])->toArray(),
 
 ];
