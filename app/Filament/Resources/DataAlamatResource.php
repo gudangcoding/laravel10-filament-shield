@@ -25,6 +25,7 @@ class DataAlamatResource extends Resource
     protected static ?string $tenantRelationshipName = 'dataalamat';
     protected static ?string $navigationGroup = 'Master Data';
     protected static ?string $navigationLabel  = 'Data dan Alamat';
+    // protected static ?string $hidetitle = Heading::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form

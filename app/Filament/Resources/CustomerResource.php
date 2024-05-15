@@ -5,13 +5,21 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Filament\Resources\CustomerResource\RelationManagers;
 use App\Models\Customer;
+use Filament\Facades\Filament;
 use Filament\Forms;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tab;
+
 
 class CustomerResource extends Resource
 {
@@ -23,18 +31,96 @@ class CustomerResource extends Resource
     {
         $role_id = auth()->user()->roles->pluck('id')->first();
         $user_id = auth()->user()->id;
+        $user = Auth::user();
+        $teamId = Filament::getTenant()->id; //$user->currentTeam->id
         return $form
             ->schema([
+                Section::make('Customer Form')
+                    ->columns(4)
+                    ->schema([
+                        // FileUpload::make('gambar')
+                        //     ->directory('Customer'),
+                        // TextInput::make('name')
+                        //     ->live(onBlur: true)
+                        //     ->afterStateUpdated(
+                        //         fn (Set $set, ?string $state) =>
+                        //         $set('slug', Str::slug($state))
+                        //     )
+                        //     ->label('Name')
+                        //     ->required(),
+                        // TextInput::make('slug')->label('Slug'),
+                        // Select::make('category_id')
+                        //     ->label('Kategori')
+                        //     ->options(Category::pluck('name', 'id')->toArray())
+                        //     ->default($form->getRecord()->category_id ?? null),
+                        // TextInput::make('deskripsi')->label('Deskripsi'),
+                        // TextInput::make('format_satuan')
+                        //     ->label('Format Satuan')
+                        //     ->default('Ctn/Box/Card/Pcs')
+                        //     ->helperText('COntoh : Ctn/Box/Card/Pcs'),
+                        TextInput::make('uuid')->label('UUID'),
+                        TextInput::make('id_produk')->label('ID Produk'),
+                        TextInput::make('nama_produk_cn')->label('Nama Produk (Cn)')->helperText('Nama Produk Versi Bahasa Cina'),
+                        TextInput::make('nama_produk')->label('Nama Produk (ID)')->helperText('Nama Produk Versi Bahasa Indonesia'),
+                        TextInput::make('tag')->label('Tag'),
+                        TextInput::make('category_id')->label('Kategori'),
+                        TextInput::make('deskripsi')->label('Deskripsi'),
+                        Hidden::make('team_id')->default($teamId),
+                        Hidden::make('user_id')->default($user->id)
+                    ]),
 
-                Forms\Components\TextInput::make('nama')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('nama_toko')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('nama_bank')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('no_rek')
-                    ->maxLength(255),
+
+
+                Tabs::make('Tab')
+
+                    ->tabs([
+                        Tabs\Tab::make('Info')
+                            ->model(Customer::class) // target input data
+
+                            ->schema([
+                                // Field form terkait harga
+                                TextInput::make('harga_jual')->label('Harga Jual'),
+                                TextInput::make('harga_beli')->label('Harga Beli'),
+                                // ... field form lainnya
+                            ]),
+
+                        Tabs\Tab::make('Keterangan')
+                            ->model(Customer::class) // target input data
+
+                            ->schema([
+                                // Field form terkait inventori
+                                TextInput::make('stok')->label('Stok'),
+                                TextInput::make('minimum_stok')->label('Stok Minimum'),
+                                // ... field form lainnya
+                            ]),
+
+                        Tabs\Tab::make('Pembayaran')
+                            ->model(Customer::class) // target input data
+
+                            ->schema([
+                                // Field form terkait penjualan
+                                TextInput::make('jumlah_terjual')->label('Jumlah Terjual'),
+                                TextInput::make('pendapatan_penjualan')->label('Pendapatan Penjualan'),
+                                // ... field form lainnya
+                            ]),
+
+                        Tabs\Tab::make('Pembelian')
+                            ->model(Customer::class) // target input data
+
+                            ->schema([
+                                // Field form terkait pembelian
+                                TextInput::make('jumlah_dibeli')->label('Jumlah Dibeli'),
+                                TextInput::make('biaya_pembelian')->label('Biaya Pembelian'),
+                                // ... field form lainnya
+                            ]),
+
+
+                    ])
+                    ->columnSpanFull()
+
+
+
+
             ]);
     }
 

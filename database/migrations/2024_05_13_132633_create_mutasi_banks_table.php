@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mutasi_banks', function (Blueprint $table) {
-            $table->id();
+            $table->uuid();
             $table->foreignId('team_id')->nullable()->constrained();
             $table->foreignId('user_id')->nullable()->constrained();
             $table->date('tanggal')->nullable();

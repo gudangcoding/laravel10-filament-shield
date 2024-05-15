@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+        Schema::create('karyawans', function (Blueprint $table) {
+            $table->uuid();
             $table->foreignId('team_id')->constrained()->cascadeOnDelete()->nullable(true);
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete()->nullable(true);
-            $table->string('type');
-            $table->morphs('notifiable');
-            $table->text('data');
-            $table->timestamp('read_at')->nullable();
+            $table->string('kode_karyawan');
+            $table->string('nama_karyawan')->unique();
+            $table->string('ktp');
+            $table->string('kk');
+            $table->string('alamat');
+            $table->string('no_hp');
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notifications');
+        Schema::dropIfExists('karyawans');
     }
 };

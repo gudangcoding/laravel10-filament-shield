@@ -32,7 +32,7 @@ use Illuminate\Support\Facades\Session;
 class MutasiBankResource extends Resource
 {
     protected static ?string $model = MutasiBank::class;
-    protected static ?string $navigationGroup = 'Master Data';
+    protected static ?string $navigationGroup = 'Keuangan';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationLabel = 'Mutasi Bank';
 

@@ -110,7 +110,7 @@ https://forum.aapanel.com/d/18317-aapanel-linux-panel-6834-installation-tutorial
 https://www.rosehosting.com/blog/how-to-install-aapanel-on-debian-11/
 </li>
 <li>
-Prerequisites
+<p>Prerequisites
 A server with Debian 11 as OS
 User privileges: root or non-root user with sudo privileges
 Step 1. Update the System
@@ -120,14 +120,17 @@ sudo apt-get update -y && sudo apt-get upgrade -y
 Step 2. Download aaPanel script
 To download and set the aaPanel script executable, use the following commands:
 
-wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh
+<p>
+<pre>wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh</pre>
 
-sudo chmod +x install.sh
-Step 3. Install aaPanel
-To install the aaPanel execute the following command:
+<pre>sudo chmod +x install.sh</pre>
 
-sudo bash install.sh
-You will be asked if you want to install the aaPanel into the /www directory on your server:
+Step 3. Install aaPanel<br>
+To install the aaPanel execute the following command:<br>
+
+<pre>sudo bash install.sh</pre>
+
+You will be asked if you want to install the aaPanel into the /www directory on your server:<br>
 
 +----------------------------------------------------------------------
 | aaPanel 6.x FOR CentOS/Ubuntu/Debian
@@ -137,20 +140,20 @@ You will be asked if you want to install the aaPanel into the /www directory on 
 | The WebPanel URL will be http://SERVER_IP:7800 when installed.
 +----------------------------------------------------------------------
 
-Do you want to install aaPanel to the /www directory now?(y/n): Y
-Once you confirm, the installation will start and it will take up to 3 minutes. You will see the following output after successful installation:
+<p>Do you want to install aaPanel to the /www directory now?(y/n): Y
+Once you confirm, the installation will start and it will take up to 3 minutes. You will see the following output after successful installation:</p>
 
-# Congratulations! Installed successfully!
+# Congratulations! Installed successfully!<br>
 
-aaPanel Internet Address: https://YourServerIP:7800/64b21d3e
-aaPanel Internal Address: https://YourServerIP:7800/64b21d3e
-username: zjs6ojyz
-password: 7cf519ed
-Warning:
-If you cannot access the panel,
-release the following port (7800|888|80|443|20|21) in the security group
-==================================================================
-Time consumed: 2 Minute!
+aaPanel Internet Address: https://YourServerIP:7800/64b21d3e<br>
+aaPanel Internal Address: https://YourServerIP:7800/64b21d3e<br>
+username: zjs6ojyz<br>
+password: 7cf519ed<br>
+Warning:<br>
+If you cannot access the panel,<br>
+release the following port (7800|888|80|443|20|21) in the security group<br>
+==================================================================<br>
+Time consumed: 2 Minute!<br>
 
 </li>
 <li>

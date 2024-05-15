@@ -78,6 +78,9 @@
             "pestphp/pest-plugin": true
         }
     },
+    "file" :  [
+        "app/Helpers/Helper.php"
+    ],
     "minimum-stability": "stable",
     "prefer-stable": true
 }

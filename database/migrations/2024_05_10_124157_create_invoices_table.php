@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('invoices', function (Blueprint $table) {
-            $table->id();
+            $table->uuid();
             $table->foreignId('team_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('data_alamat_id')->constrained();
@@ -29,7 +29,7 @@ return new class extends Migration
         });
 
         Schema::create('invoice_details', function (Blueprint $table) {
-            $table->id();
+            $table->uuid();
             $table->foreignId('invoice_id')->nullable()->constrained();
             $table->integer('total_qty')->nullable();
             $table->decimal('total_amount', 10, 2)->nullable();

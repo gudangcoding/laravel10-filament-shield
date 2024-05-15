@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('customers', function (Blueprint $table) {
-            $table->id();
+            $table->uuid();
             $table->foreignId('team_id')->nullable()->constrained();
             $table->foreignId('user_id')->nullable()->constrained();
-            $table->string('nama');
+            $table->string('nama')->unique();
             $table->string('nama_toko')->nullable();
             $table->string('nama_bank')->nullable();
             $table->string('no_rek')->nullable();

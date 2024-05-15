@@ -17,6 +17,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TextInput\Mask;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -28,6 +29,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Models\Team;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tab;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Support\RawJs;
 
 class ProductResource extends Resource
 {
@@ -44,6 +49,10 @@ class ProductResource extends Resource
     {
         return Product::count();
     }
+
+
+
+
     public static function form(Form $form): Form
     {
         $user = Auth::user();
@@ -51,37 +60,113 @@ class ProductResource extends Resource
         return $form
             ->schema([
                 Section::make('Product Form')
-                    ->columns(2)
+                    ->columns(4)
                     ->schema([
-                        Card::make()
-                            ->schema([
-
-                                FileUpload::make('gambar')
-                                    ->directory('product'),
-                                TextInput::make('name')
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(
-                                        fn (Set $set, ?string $state) =>
-                                        $set('slug', str::slug($state))
-                                    )
-                                    ->label('Name')
-                                    ->required(),
-                                TextInput::make('slug')->label('Slug'),
-                                Select::make('category_id')
-                                    ->label('Kategori')
-                                    ->options(Category::pluck('name', 'id')->toArray())
-                                    ->default($form->getRecord()->category_id ?? null),
-                                TextInput::make('deskripsi')->label('Deskripsi'),
-                                TextInput::make('format_satuan')
-                                    ->label('Format Satuan')
-                                    ->default('Ctn/Box/Card/Pcs')
-                                    ->helperText('COntoh : Ctn/Box/Card/Pcs'),
-
-                                Hidden::make('team_id')->default($teamId),
-                                Hidden::make('user_id')->default($user->id)
-                            ])->columns(2),
-
+                        // FileUpload::make('gambar')
+                        //     ->directory('product'),
+                        // TextInput::make('name')
+                        //     ->live(onBlur: true)
+                        //     ->afterStateUpdated(
+                        //         fn (Set $set, ?string $state) =>
+                        //         $set('slug', Str::slug($state))
+                        //     )
+                        //     ->label('Name')
+                        //     ->required(),
+                        // TextInput::make('slug')->label('Slug'),
+                        // Select::make('category_id')
+                        //     ->label('Kategori')
+                        //     ->options(Category::pluck('name', 'id')->toArray())
+                        //     ->default($form->getRecord()->category_id ?? null),
+                        // TextInput::make('deskripsi')->label('Deskripsi'),
+                        // TextInput::make('format_satuan')
+                        //     ->label('Format Satuan')
+                        //     ->default('Ctn/Box/Card/Pcs')
+                        //     ->helperText('COntoh : Ctn/Box/Card/Pcs'),
+                        TextInput::make('uuid')->label('UUID'),
+                        TextInput::make('id_produk')->label('ID Produk'),
+                        TextInput::make('nama_produk_cn')->label('Nama Produk (Cn)'),
+                        // ->helperText('Nama Produk Versi Bahasa Cina'),
+                        TextInput::make('nama_produk')->label('Nama Produk (ID)'),
+                        // ->helperText('Nama Produk Versi Bahasa Indonesia'),
+                        // TextInput::make('tag')->label('Tag')
+                        //     ->mask('/'),
+                        // ->mask('Ctn/Dz/card/Pcs')
+                        // ->placeholder('/'),
+                        //
+                        // TextInput::make('data')
+                        //     ->label('Data')
+                        //     ->mask('----/----/----/----') // Initial mask for the format
+                        //     ->rules(['regex:/^\d{4}\/\d{4}\/\d{4}\/\d{4}$/']) // Regex validation for the format
+                        // ,
+                        TextInput::make('tes')
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(','),
+                        TextInput::make('category_id')->label('Kategori'),
+                        TextInput::make('deskripsi')->label('Deskripsi'),
+                        Hidden::make('team_id')->default($teamId),
+                        Hidden::make('user_id')->default($user->id)
                     ]),
+
+
+
+                Tabs::make('Tab')
+
+                    ->tabs([
+                        Tabs\Tab::make('Harga')
+                            ->model(Product::class) // target input data
+
+                            ->schema([
+                                // Field form terkait harga
+                                TextInput::make('harga_jual')->label('Harga Jual'),
+                                TextInput::make('harga_beli')->label('Harga Beli'),
+                                // ... field form lainnya
+                            ]),
+
+                        Tabs\Tab::make('Inventori')
+                            ->model(Product::class) // target input data
+
+                            ->schema([
+                                // Field form terkait inventori
+                                TextInput::make('stok')->label('Stok'),
+                                TextInput::make('minimum_stok')->label('Stok Minimum'),
+                                // ... field form lainnya
+                            ]),
+
+                        Tabs\Tab::make('Penjualan')
+                            ->model(Product::class) // target input data
+
+                            ->schema([
+                                // Field form terkait penjualan
+                                TextInput::make('jumlah_terjual')->label('Jumlah Terjual'),
+                                TextInput::make('pendapatan_penjualan')->label('Pendapatan Penjualan'),
+                                // ... field form lainnya
+                            ]),
+
+                        Tabs\Tab::make('Pembelian')
+                            ->model(Product::class) // target input data
+
+                            ->schema([
+                                // Field form terkait pembelian
+                                TextInput::make('jumlah_dibeli')->label('Jumlah Dibeli'),
+                                TextInput::make('biaya_pembelian')->label('Biaya Pembelian'),
+                                // ... field form lainnya
+                            ]),
+
+                        Tabs\Tab::make('Bea Cukai')
+                            ->model(Product::class) // target input data
+
+                            ->schema([
+                                // Field form terkait bea cukai
+                                TextInput::make('bea_masuk')->label('Bea Masuk'),
+                                TextInput::make('bea_keluar')->label('Bea Keluar'),
+                                // ... field form lainnya
+                            ]),
+                    ])
+                    ->columnSpanFull()
+
+
+
+
             ]);
     }
 

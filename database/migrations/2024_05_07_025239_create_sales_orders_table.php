@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sales_orders', function (Blueprint $table) {
-            $table->id();
+            $table->uuid();
             $table->string('no_order')->unique();
             $table->foreignId('team_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->timestamps();
         });
         Schema::create('sales_detail', function (Blueprint $table) {
-            $table->id();
+            $table->uuid();
             $table->foreignId('sales_order_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('satuan_id')->nullable()->constrained()->cascadeOnDelete();
