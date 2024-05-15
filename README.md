@@ -116,7 +116,8 @@ User privileges: root or non-root user with sudo privileges
 Step 1. Update the System
 Update the system packages to the latest versions available. Execute the following command:
 
-sudo apt-get update -y && sudo apt-get upgrade -y
+<pre>sudo apt-get update -y && sudo apt-get upgrade -y</pre>
+
 Step 2. Download aaPanel script
 To download and set the aaPanel script executable, use the following commands:
 
