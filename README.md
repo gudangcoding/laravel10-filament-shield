@@ -157,11 +157,13 @@ Time consumed: 2 Minute!<br>
 <li>
 htacess untuk vps agar tidak perlu mengakses folder public http://ip-vps/public menjadi http://ip-vps<br>
 Buat File htacess di root proyek dan tuliskan kode di bawah ini<br>
+<pre>
 <IfModule mod_rewrite.c><br>
 RewriteEngine On<br>
 RewriteRule ^(.*)$ public/$1 [L]<br>
  </IfModule> <br>
-</li>
+ </pre>
+</li>  
 <li>
 <h1>Install Composer di VPS</h1>
 
@@ -179,5 +181,29 @@ RewriteRule ^(.*)$ public/$1 [L]<br>
 <p>
     ke menu File -> terminal
 </p>
+</li>
+<li>
+<h1>Ekstensi Vs Code ? Cursor Untuk Remote Server</h1>
+<p>SFTP/FTP sync</p>
+</li>
+<li>
+<h2>Remote File dari cursor/vscode dengan ekstensi SFTP dari Natizyskunk dan sftp FS dari Kelvin</h2>
+<p>Buat masing Masing config di volder .vscode/sftp.json dan ssh.json</p>
+<pre>
+ "name": "Nama Proyek",
+    "host": "ip/192.168.1.123",
+    "protocol": "ssh",
+    "port": 22,
+    "secure": true,
+    "username": "usernamevps",
+    "password": "Password vps",
+    "remotePath": "folder yang diremote",
+    "uploadOnSave": true
+</pre>
+<p>Aktifkan pengaturan write pada folder target di vps dengan atau sudo chmod 777
+</li>
+<li>
+<h2>Konek Database</h2>
+<p>Install Ekstensi "Database Client" dari cweijan lalu aktifkan icon database pada sidebar dan buat koneksi baru</p>
 </li>
 </ol>
