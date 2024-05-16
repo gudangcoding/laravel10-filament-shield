@@ -16,7 +16,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class SatuanResource extends Resource
 {
     protected static ?string $model = Satuan::class;
-
+    protected static ?string $navigationGroup = "Master Data";
+    protected static ?string $title = "Satuan";
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form

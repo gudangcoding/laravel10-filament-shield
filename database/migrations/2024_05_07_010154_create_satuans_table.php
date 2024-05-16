@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('satuans', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('team_id')->nullable()->constrained();
+            $table->foreignId('user_id')->nullable()->constrained();
             $table->string('type');
             $table->string('name');
             $table->timestamps();

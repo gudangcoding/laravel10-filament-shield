@@ -1,4 +1,4 @@
-<h1>Langkah Langkah filament panel multi tenant dan shield</h1>
+<h1>Langkah Langkah filament panel multi tenant dan shield oke</h1>
 <img src='pos1.png'><br>
 <ol>
     <li><pre>composer create-project laravel/laravel:^10.0 nama_proyek</pre></li>
@@ -192,7 +192,7 @@ RewriteRule ^(.*)$ public/$1 [L]<br>
 <pre>
  "name": "Nama Proyek",
     "host": "ip/192.168.1.123",
-    "protocol": "ssh",
+    "protocol": "ssh", //jika ftp ganti jadi ftp jika vps ganti jadi sftp
     "port": 22,
     "secure": true,
     "username": "usernamevps",

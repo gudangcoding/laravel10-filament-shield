@@ -51,4 +51,8 @@ class Team extends Model
     {
         return $this->HasMany(MutasiBank::class);
     }
+    public function satuan(): HasMany
+    {
+        return $this->HasMany(Satuan::class);
+    }
 }
