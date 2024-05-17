@@ -84,7 +84,6 @@ class AdminPanelProvider extends PanelProvider
             ->tenantMenu(function () {
                 return auth()->user()->hasRole('super_admin'); // Check for super_admin role
             })
-            // ->brandLogo(fn () => view('filament.admin.logo'))
             // ->brandLogo(asset('images/logo.svg'))
         ;
     }
