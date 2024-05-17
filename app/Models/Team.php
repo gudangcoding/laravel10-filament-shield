@@ -55,4 +55,12 @@ class Team extends Model
     {
         return $this->HasMany(Satuan::class);
     }
+    public function supplier(): HasMany
+    {
+        return $this->HasMany(Supplier::class);
+    }
+    public function karyawan(): HasMany
+    {
+        return $this->HasMany(Karyawan::class);
+    }
 }

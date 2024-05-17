@@ -31,6 +31,7 @@ use Illuminate\Support\Str;
 use App\Models\Team;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tab;
+use Filament\Forms\Components\Toggle;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Support\RawJs;
 
@@ -103,6 +104,8 @@ class ProductResource extends Resource
                             ->stripCharacters(','),
                         TextInput::make('category_id')->label('Kategori'),
                         TextInput::make('deskripsi')->label('Deskripsi'),
+                        Toggle::make('aktif')
+                            ->label('Aktif'),
                         Hidden::make('team_id')->default($teamId),
                         Hidden::make('user_id')->default($user->id)
                     ]),

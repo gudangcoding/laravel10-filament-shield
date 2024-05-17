@@ -206,4 +206,8 @@ RewriteRule ^(.*)$ public/$1 [L]<br>
 <h2>Konek Database</h2>
 <p>Install Ekstensi "Database Client" dari cweijan lalu aktifkan icon database pada sidebar dan buat koneksi baru</p>
 </li>
+<li>
+<h3>Link pgsql</h3
+https://www.enterprisedb.com/download-postgresql-binaries
+</li>
 </ol>

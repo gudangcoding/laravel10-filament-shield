@@ -6,6 +6,8 @@ use App\Filament\Pages\Tenancy\EditTeamProfile;
 use App\Filament\Pages\Tenancy\RegisterTeam;
 use App\Http\Middleware\TenantMiddleware;
 use App\Models\Team;
+use Filament\Auth\FilamentUser; // Import FilamentUser
+use Filament\Contracts\User; // Import User Contract
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -27,44 +29,10 @@ use Filament\Plugin;
 
 class AdminPanelProvider extends PanelProvider
 {
-
+    use HasRoles;
     public function panel(Panel $panel): Panel
     {
-        // $rolePlugin = \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make();
-        // $tenantMenu = true;
-        // $roles = auth()->user()->roles->pluck('name')->first();
-        // if (!auth()->check() || !auth()->user()->roles(['admin', 'super_admin'])) {
-        //     $rolePlugin = null;
-        //     $tenantMenu = false;
-        // }
-        // $roles = auth()->user()->roles->pluck('name')->first();
 
-
-        $rolePlugin = \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make();
-        $tenantMenu = true;
-
-        if (auth()->check()) {
-            $user = auth()->user();
-            $roles = $user->roles->pluck('name')->first();
-
-            // Ubah kondisi berdasarkan peran yang diperlukan
-            if ($roles === 'admin' || $roles === 'super_admin') {
-                // Lakukan sesuatu jika pengguna memiliki peran 'admin' atau 'super_admin'
-                // Misalnya, set variabel $rolePlugin ke instance FilamentShieldPlugin
-                $rolePlugin = new FilamentShieldPlugin;
-                $tenantMenu = true;
-            } else {
-                // Lakukan sesuatu jika pengguna tidak memiliki peran yang diperlukan
-                // Misalnya, set variabel $rolePlugin menjadi null dan nonaktifkan menu tenant
-                $rolePlugin = null;
-                $tenantMenu = false;
-            }
-        } else {
-            // Lakukan sesuatu jika pengguna tidak terotentikasi
-            // Misalnya, set variabel $rolePlugin menjadi null dan nonaktifkan menu tenant
-            $rolePlugin = null;
-            $tenantMenu = false;
-        }
 
         return $panel
             ->default()
@@ -100,23 +68,22 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-
-
             ])
             ->plugins([
-                $rolePlugin ?? new FilamentShieldPlugin,
 
+                FilamentShieldPlugin::make()
             ])
+
             ->tenant(Team::class, ownershipRelationship: 'team', slugAttribute: 'slug')
-            ->tenantMenu(
-                TenantMiddleware::class,
-                // $roles === 'super_admin' ? true : false,
-            )
+
+
             ->tenantRegistration(RegisterTeam::class)
             ->tenantProfile(EditTeamProfile::class)
             ->brandName('PT SAJ')
             ->databaseNotifications()
-            // ->databaseNotifications()
+            ->tenantMenu(function () {
+                return auth()->user()->hasRole('super_admin'); // Check for super_admin role
+            })
             // ->brandLogo(fn () => view('filament.admin.logo'))
             // ->brandLogo(asset('images/logo.svg'))
         ;

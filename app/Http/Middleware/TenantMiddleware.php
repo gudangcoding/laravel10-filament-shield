@@ -3,27 +3,35 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 class TenantMiddleware
 {
-    public function handle(Request $request, Closure $next)
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next)
     {
-        // Pastikan pengguna terotentikasi
-        if (!auth()->check()) {
-            return redirect()->route('login');
+        // Default value for tenantMenu
+        $tenantMenu = false;
+
+        // Check if the user is authenticated
+        if ($user = Auth::user()) {
+            // Check the user's role
+            $roleName = auth()->user()->roles->first()->name;
+            if ($roleName == "super_admin" || $roleName == "admin") {
+                $tenantMenu = true;
+            }
         }
 
-        // Ambil peran pertama dari pengguna yang sedang login
-        $role = auth()->user()->roles->pluck('name')->first();
+        // Share tenantMenu value with the request
+        $request->attributes->set('tenantMenu', $tenantMenu);
 
-        // Cek apakah pengguna memiliki peran 'super_admin' atau 'admin'
-        if ($role === 'super_admin' || $role === 'admin') {
-            // Pengguna memiliki akses ke menu tenant, lanjutkan ke permintaan berikutnya
-            return $next($request);
-        }
-
-        // Pengguna tidak memiliki akses ke menu tenant, alihkan atau lakukan tindakan lain sesuai kebijakan Anda
-        return redirect()->route('forbidden');
+        return $next($request);
     }
 }
