@@ -212,7 +212,8 @@ https://www.enterprisedb.com/download-postgresql-binaries
 </li>
 <li>
 <h3>Jika bukan super_admin hide role menu</h3>
-<pre>public static function shouldRegisterNavigation(): bool
+<pre>
+public static function shouldRegisterNavigation(): bool
     {
         // return Utils::isResourceNavigationRegistered();
         //hide menu jika bukan super admin
