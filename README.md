@@ -207,7 +207,17 @@ RewriteRule ^(.*)$ public/$1 [L]<br>
 <p>Install Ekstensi "Database Client" dari cweijan lalu aktifkan icon database pada sidebar dan buat koneksi baru</p>
 </li>
 <li>
-<h3>Link pgsql</h3
+<h3>Link pgsql</h3>
 https://www.enterprisedb.com/download-postgresql-binaries
+</li>
+<li>
+<h3>Jika bukan super_admin hide role menu</h3>
+<pre>public static function shouldRegisterNavigation(): bool
+    {
+        // return Utils::isResourceNavigationRegistered();
+        //hide menu jika bukan super admin
+        return auth()->user()->hasAnyRole(['admin', 'super_admin']);
+    }
+    </pre>
 </li>
 </ol>
