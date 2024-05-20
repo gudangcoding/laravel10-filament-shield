@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Filament\Tables\Actions\Action;
 
 class CategoryResource extends Resource
 {
@@ -104,13 +105,38 @@ class CategoryResource extends Resource
                     ->color('success')
                     ->icon('heroicon-o-arrow-down-circle')
                     ->action(function (Model $record) {
-                        return response()->streamDownload(function () use ($record) {
-                            echo Pdf::loadHtml(
-                                Blade::render('pdf', ['record' => $record])
-                            )->stream();
-                        }, $record->number . '.pdf');
+
+                        $pdfContent = Pdf::loadHTML(
+                            Blade::render('print', ['record' => $record])
+                        )->output();
+
+
+                        //  //download pdf
+                        return response()->streamDownload(function () use ($pdfContent) {
+                            echo $pdfContent;
+                        }, "INVOICE-" . $record->id . '.pdf', [
+                            'Content-Type' => 'application/pdf',
+                            'Content-Disposition' => 'attachment; filename="' . $record->id . '.pdf"',
+                        ]);
+
+                        //  //view browser
+                        // return response($pdfContent)
+                        //     ->header('Content-Type', 'application/pdf')
+                        //     ->header('Content-Disposition', 'inline; filename="' . $record->number . '.pdf"');
+                        // dd($record->number);
                     }),
+                Tables\Actions\Action::make('print')
+                    ->label('Print')
+                    ->color('primary')
+                    ->icon('heroicon-o-printer')
+                    // ->url(fn (Model $record) => route('invoices.print'))
+                    ->url(fn (Model $record) => route('invoices.print', $record->id))
+                    ->openUrlInNewTab()
+
+
+
             ])
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

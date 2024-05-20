@@ -18,7 +18,7 @@ class ImportMutasi implements ToModel
 
     public function __construct()
     {
-        $this->customers = Customer::pluck('nama')->toArray();
+        $this->customers = Customer::pluck('nama_customer')->toArray();
         $this->saldo = 0;
         Log::info('ImportMutasi initialized.');
     }

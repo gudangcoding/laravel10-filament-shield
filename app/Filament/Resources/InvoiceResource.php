@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\InvoiceResource\Pages;
 use App\Filament\Resources\InvoiceResource\RelationManagers;
+use App\Models\Customer;
 use App\Models\DataAlamat;
 use App\Models\Invoice;
 use App\Models\Product;
@@ -66,7 +67,8 @@ class InvoiceResource extends Resource
                                     ->readOnly(),
                                 Select::make('customer_id')
                                     ->label('Customer')
-                                    ->options(DataAlamat::where('tipe', 'customer')->pluck('name', 'id'))
+                                    ->options(Customer::get()->pluck('name', 'id'))
+                                    // ->options(Customer::where('tipe', 'customer')->pluck('name', 'id'))
                                     ->required()
 
                                     ->createOptionForm([

@@ -36,16 +36,22 @@
             border-spacing: 0;
         }
 
+        table,
+        tr,
+        td {
+            border: dotted black 1px;
+        }
+
         table.products {
             font-size: 0.875rem;
         }
 
         table.products tr {
-            background-color: rgb(96 165 250);
+            background-color: white;
         }
 
         table.products th {
-            color: #ffffff;
+            color: #000000;
             padding: 0.5rem;
         }
 
@@ -69,7 +75,7 @@
     <table class="w-full">
         <tr>
             <td class="w-half">
-                <img src="{{ asset('favicon.ico') }}" alt="laravel daily" width="200" />
+                {{-- <img src="{{ asset('favicon.ico') }}" alt="laravel daily" width="200" /> --}}
             </td>
             <td class="w-half">
                 <h2>Invoice ID: 834847473</h2>

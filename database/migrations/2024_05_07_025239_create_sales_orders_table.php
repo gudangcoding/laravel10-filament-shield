@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('no_order')->unique();
             $table->foreignId('team_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('data_alamat_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('satuan_id')->nullable()->constrained()->cascadeOnDelete();
             $table->decimal('total_amount', 8, 2)->nullable();
             $table->integer('total_barang')->nullable();

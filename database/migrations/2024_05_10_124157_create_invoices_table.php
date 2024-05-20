@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('team_id')->constrained();
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('data_alamat_id')->constrained();
             $table->string('order_number')->nullable();
             $table->string('status')->nullable();
             $table->string('type_bayar')->nullable();

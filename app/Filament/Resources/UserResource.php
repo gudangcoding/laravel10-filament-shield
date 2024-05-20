@@ -29,7 +29,7 @@ class UserResource extends Resource
     protected static ?string $recordTitleAttribute = 'name'; //untuk global search
     public static function getNavigationGroup(): ?string
     {
-        return 'Settings';
+        return 'Hak Akses';
     }
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';

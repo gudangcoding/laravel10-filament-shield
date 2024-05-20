@@ -20,10 +20,7 @@ class Team extends Model
     {
         return $this->BelongsToMany(User::class);
     }
-    public function dataalamat(): HasMany
-    {
-        return $this->HasMany(DataAlamat::class);
-    }
+
     public function categories(): HasMany
     {
         return $this->HasMany(Category::class);
@@ -62,5 +59,28 @@ class Team extends Model
     public function karyawan(): HasMany
     {
         return $this->HasMany(Karyawan::class);
+    }
+
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(Contacts::class);
+    }
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class);
+    }
+
+    public function custumerClass(): HasMany
+    {
+        return $this->HasMany(CustomerClass::class);
+    }
+    public function custumerCategory(): HasMany
+    {
+        return $this->HasMany(CustomerCategory::class);
+    }
+
+    public function provinsi(): BelongsTo
+    {
+        return $this->belongsTo(Provinsi::class, 'provinsi_id');
     }
 }

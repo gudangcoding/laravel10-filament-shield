@@ -5,12 +5,13 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SalesOrderResource\Pages;
 use App\Filament\Resources\SalesOrderResource\RelationManagers;
 use App\Filament\Resources\SalesOrderResource\RelationManagers\SalesDetailRelationManager;
-use App\Models\DataAlamat;
+use App\Models\Customer;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\SalesOrder;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Closure;
+// use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
@@ -37,6 +38,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
 use Livewire\Attributes\Reactive;
 use NunoMaduro\Collision\Adapters\Phpunit\State;
+use Filament\Tables\Actions\Action;
 
 class SalesOrderResource extends Resource
 {
@@ -74,7 +76,8 @@ class SalesOrderResource extends Resource
                                     ->readOnly(),
                                 Select::make('customer_id')
                                     ->label('Customer')
-                                    ->options(DataAlamat::where('tipe', 'customer')->pluck('name', 'id'))
+                                    ->options(Customer::get()->pluck('name', 'id'))
+                                    // ->options(Customer::where('tipe', 'customer')->pluck('name', 'id'))
                                     ->required()
 
                                     ->createOptionForm([
@@ -144,7 +147,7 @@ class SalesOrderResource extends Resource
                                     ->schema([
                                         Select::make('product_id')
                                             ->label('Product')
-                                            ->options(Product::query()->pluck('name', 'id'))
+                                            ->options(Product::query()->pluck('nama_produk', 'id'))
                                             ->required()
                                             ->live(onBlur: true)
                                             ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
@@ -236,6 +239,10 @@ class SalesOrderResource extends Resource
                             )->stream();
                         }, $record->number . '.pdf');
                     }),
+                Action::make('Download Pdf')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->url(fn (SalesOrder $record): string => route('/invoice', ['record' => $record]))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

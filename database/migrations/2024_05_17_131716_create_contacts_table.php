@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('contacts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('customer_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->string('no_hp')->nullable();
+            $table->string('nama')->nullable();
+            $table->string('hubungan')->nullable();
+            $table->string('msg_app')->nullable();
             $table->timestamps();
         });
     }

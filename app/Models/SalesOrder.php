@@ -14,7 +14,6 @@ class SalesOrder extends Model
         'no_order',
         'team_id',
         'user_id',
-        'data_alamat_id',
         'satuan_id',
         'total_amount',
         'total_barang',
