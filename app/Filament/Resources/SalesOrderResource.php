@@ -124,11 +124,17 @@ class SalesOrderResource extends Resource
                                     ->label('Total Belanja')
                                     ->content(function ($get) {
                                         $sum = 0;
-                                        foreach ($get('order_details') as $product) {
-                                            $sum = $sum + ($product['harga'] * $product['qty']);
+                                        $orderDetails = $get('order_details');
+                                        if (is_array($orderDetails)) {
+                                            foreach ($orderDetails as $product) {
+                                                $harga = isset($product['harga']) ? (float) $product['harga'] : 0;
+                                                $qty = isset($product['qty']) ? (float) $product['qty'] : 0;
+                                                $sum += $harga * $qty;
+                                            }
                                         }
-                                        return $sum;
+                                        return number_format($sum, 2, '.', ',');
                                     }),
+
                                 Hidden::make('amount'),
                                 TextInput::make('dp')->label('DP')->required(),
                                 TextInput::make('sisa')->label('Sisa')->required(),
@@ -136,93 +142,6 @@ class SalesOrderResource extends Resource
                             ])
                             ->columns(1),
                     ]),
-
-
-                // Card::make('Order Details')
-                //     ->schema([
-                //         Repeater::make('order_details')
-                //             ->relationship()
-                //             // ->relationship('salesDetails')
-                //             ->schema([
-                //                 Grid::make('')
-                //                     ->schema([
-                //                         Select::make('product_id')
-                //                             ->label('Product')
-                //                             ->options(Product::query()->pluck('nama_produk', 'id'))
-                //                             ->required()
-                //                             ->live(onBlur: true)
-                //                             ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
-                //                                 $productVariant = Product::where('id', $state)->first();
-                //                                 if ($productVariant) {
-                //                                     $harga = $productVariant->harga ?? 0;
-                //                                     $subtotal = $get('qty') * $harga;
-                //                                     $set('harga', $harga);
-                //                                     $set('subtotal', $subtotal);
-                //                                 } else {
-
-                //                                     $set('harga', 0);
-                //                                     $set('subtotal', 0);
-                //                                 }
-                //                             })
-                //                             ->distinct()
-                //                             ->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                //                             ->columnSpan([
-                //                                 'md' => 1,
-                //                             ])
-
-                //                             ->searchable(),
-                //                         Select::make('satuan')
-                //                             ->label('Satuan')
-                //                             ->options([
-                //                                 'ctn' => 'Carton',
-                //                                 'box' => 'Box',
-                //                                 'lsn' => 'Lusin',
-                //                                 'pack' => 'Pack',
-                //                                 'pcs' => 'Pcs'
-                //                             ])
-                //                             ->required()
-                //                             ->live(onBlur: true)
-                //                             ->columnSpan(1),
-                //                         TextInput::make('qty')
-                //                             ->label('Quantity')
-                //                             ->default(1)
-                //                             ->live(onBlur: true)
-                //                             ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
-                //                                 $qty = $state;
-                //                                 $harga = $get('harga');
-                //                                 $subtotal = $harga * $qty;
-                //                                 $set('subtotal', $subtotal);
-                //                             })
-                //                             ->required()
-                //                             ->columnSpan(1),
-                //                         TextInput::make('harga')
-                //                             ->columnSpan(1)
-                //                             ->label('Unit Price')
-                //                             ->required(),
-                //                         TextInput::make('subtotal')
-                //                             ->numeric()
-                //                             ->reactive()
-                //                             ->columnSpan(1)
-                //                             ->label('Subtotal')
-                //                             ->numeric()
-                //                             ->default(function ($state, Forms\Set $set, Get $get) {
-                //                                 if ($get('qty') === '' && $get('harga')) {
-                //                                     $subttotal = $get('qty') * $get('harga');
-                //                                 } else {
-                //                                     $subttotal = 0;
-                //                                 }
-
-                //                                 return  number_format($subttotal, 2, '.', '');
-                //                             })
-                //                             ->disabled()
-
-                //                     ])
-                //                     ->columns(5)
-
-                //             ])
-                //             ->addActionLabel('Tambah Produk'),
-
-                //     ])
 
 
                 Card::make('Order Details')
@@ -244,48 +163,32 @@ class SalesOrderResource extends Resource
                                                 'pcs' => 'Pcs'
                                             ])
                                             ->required()
-                                            ->live(onBlur: true)
+                                            ->reactive()
                                             ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
-                                                $ketemu = Product::find($get('product_id'));
-                                                dd($ketemu);
-                                                if ($ketemu) {
-                                                    $harga = match ($state) {
-                                                        'ctn' => $ketemu->price_ctn,
-                                                        'box' => $ketemu->price_box,
-                                                        'bag' => $ketemu->price_bag,
-                                                        'card' => $ketemu->price_card,
-                                                        'lusin' => $ketemu->price_lsn,
-                                                        'pack' => $ketemu->price_pack,
-                                                        'pcs' => $ketemu->price_pcs,
-                                                        default => 0,
-                                                    };
-                                                    $subtotal = $get('qty') * $harga;
-                                                    $set('harga', number_format($subtotal, 2, '.', ''));
+                                                $product = Product::find($get('product_id'));
+                                                if ($product) {
+                                                    $priceField = 'price_' . $state;
+                                                    $price = (float) $product->$priceField;
+                                                    $set('harga', $price);
+                                                    $subtotal = (float) $get('qty') * $price;
                                                     $set('subtotal', number_format($subtotal, 2, '.', ''));
                                                 }
                                             })
                                             ->columnSpan(1),
                                         Select::make('product_id')
-
                                             ->label('Product')
                                             ->options(Product::query()->pluck('nama_produk', 'id'))
                                             ->required()
-                                            ->live(onBlur: true)
+                                            ->reactive()
                                             ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
-                                                $ketemu = Product::find($state);
-                                                if ($ketemu) {
+                                                $product = Product::find($state);
+                                                if ($product) {
                                                     $satuan = $get('satuan');
-                                                    $harga = match ($satuan) {
-                                                        'ctn' => $ketemu->price_ctn,
-                                                        'box' => $ketemu->price_box,
-                                                        'lusin' => $ketemu->price_lsn,
-                                                        'pack' => $ketemu->price_pack,
-                                                        'pcs' => $ketemu->price_pcs,
-                                                        default => 0,
-                                                    };
-                                                    $subtotal = $get('qty') * $harga;
-                                                    $set('harga', $harga);
-                                                    $set('subtotal', $subtotal);
+                                                    $priceField = 'price_' . $satuan;
+                                                    $price = (float) $product->$priceField;
+                                                    $set('harga', $price);
+                                                    $subtotal = (float) $get('qty') * $price;
+                                                    $set('subtotal', number_format($subtotal, 2, '.', ''));
                                                 } else {
                                                     $set('harga', 0);
                                                     $set('subtotal', 0);
@@ -298,10 +201,10 @@ class SalesOrderResource extends Resource
                                         TextInput::make('qty')
                                             ->label('Quantity')
                                             ->default(1)
-                                            ->live(onBlur: true)
+                                            ->reactive()
                                             ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
-                                                $harga = $get('harga');
-                                                $subtotal = $harga * $state;
+                                                $price = (float) $get('harga');
+                                                $subtotal = $price * (float) $state;
                                                 $set('subtotal', number_format($subtotal, 2, '.', ''));
                                             })
                                             ->required()
@@ -320,7 +223,7 @@ class SalesOrderResource extends Resource
                                             ->columnSpan(1)
                                             ->label('Subtotal')
                                             ->default(function ($state, Forms\Set $set, Get $get) {
-                                                return number_format($get('qty') * $get('harga'), 2, '.', '');
+                                                return number_format((float) $get('qty') * (float) $get('harga'), 2, '.', '');
                                             })
                                             ->disabled(),
                                     ])
@@ -328,9 +231,6 @@ class SalesOrderResource extends Resource
                             ])
                             ->addActionLabel('Tambah Produk'),
                     ])
-
-
-
             ]);
     }
 
