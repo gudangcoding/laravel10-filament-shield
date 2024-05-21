@@ -237,7 +237,9 @@ class SalesOrderResource extends Resource
                                             ->options([
                                                 'ctn' => 'Carton',
                                                 'box' => 'Box',
-                                                'lsn' => 'Lusin',
+                                                'bag' => 'Bag',
+                                                'card' => 'Card',
+                                                'lusin' => 'Lusin',
                                                 'pack' => 'Pack',
                                                 'pcs' => 'Pcs'
                                             ])
@@ -245,18 +247,21 @@ class SalesOrderResource extends Resource
                                             ->live(onBlur: true)
                                             ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
                                                 $ketemu = Product::find($get('product_id'));
+                                                dd($ketemu);
                                                 if ($ketemu) {
                                                     $harga = match ($state) {
                                                         'ctn' => $ketemu->price_ctn,
                                                         'box' => $ketemu->price_box,
-                                                        'lsn' => $ketemu->price_lsn,
+                                                        'bag' => $ketemu->price_bag,
+                                                        'card' => $ketemu->price_card,
+                                                        'lusin' => $ketemu->price_lsn,
                                                         'pack' => $ketemu->price_pack,
                                                         'pcs' => $ketemu->price_pcs,
                                                         default => 0,
                                                     };
                                                     $subtotal = $get('qty') * $harga;
-                                                    $set('harga', $harga);
-                                                    $set('subtotal', $subtotal);
+                                                    $set('harga', number_format($subtotal, 2, '.', ''));
+                                                    $set('subtotal', number_format($subtotal, 2, '.', ''));
                                                 }
                                             })
                                             ->columnSpan(1),
@@ -273,7 +278,7 @@ class SalesOrderResource extends Resource
                                                     $harga = match ($satuan) {
                                                         'ctn' => $ketemu->price_ctn,
                                                         'box' => $ketemu->price_box,
-                                                        'lsn' => $ketemu->price_lsn,
+                                                        'lusin' => $ketemu->price_lsn,
                                                         'pack' => $ketemu->price_pack,
                                                         'pcs' => $ketemu->price_pcs,
                                                         default => 0,

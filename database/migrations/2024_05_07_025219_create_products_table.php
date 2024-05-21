@@ -28,6 +28,10 @@ class CreateProductsTable extends Migration
             $table->decimal('price_ctn', 15, 2)->default(1);
             $table->integer('box')->default(1);
             $table->decimal('price_box', 15, 2)->default(1);
+            $table->integer('bag')->default(1);
+            $table->decimal('price_bag', 15, 2)->default(1);
+            $table->integer('card')->default(1);
+            $table->decimal('price_card', 15, 2)->default(1);
             $table->integer('lusin')->default(1);
             $table->decimal('price_lsn', 15, 2)->default(1);
             $table->integer('pack')->default(1);
