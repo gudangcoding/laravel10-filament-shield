@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SalesOrder extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'no_order',
+        'so_no',
         'team_id',
         'user_id',
         'satuan_id',
@@ -32,5 +33,15 @@ class SalesOrder extends Model
     public function order_details()
     {
         return $this->hasMany(\App\Models\SalesDetail::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(\App\Models\Customer::class, 'customer_id');
+    }
+
+    public function SalesDetail(): HasMany
+    {
+        return $this->hasMany(SalesDetail::class);
     }
 }

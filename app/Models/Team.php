@@ -83,4 +83,8 @@ class Team extends Model
     {
         return $this->belongsTo(Provinsi::class, 'provinsi_id');
     }
+    public function salesOrders(): HasMany
+    {
+        return $this->hasMany(SalesOrder::class);
+    }
 }

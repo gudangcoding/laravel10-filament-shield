@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('sales_orders', function (Blueprint $table) {
             $table->id();
-            $table->string('no_order')->unique();
-            $table->foreignId('team_id')->constrained()->cascadeOnDelete();
+            $table->string('so_no')->unique();
+            $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('satuan_id')->nullable()->constrained()->cascadeOnDelete();
             $table->decimal('total_amount', 8, 2)->nullable();
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamps();
         });
         Schema::create('sales_detail', function (Blueprint $table) {
-            $table->uuid();
+            $table->id();
             $table->foreignId('sales_order_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('satuan_id')->nullable()->constrained()->cascadeOnDelete();

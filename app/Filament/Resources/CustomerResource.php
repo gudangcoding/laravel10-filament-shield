@@ -22,6 +22,7 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use App\Models\Alamat;
+use Illuminate\Support\Facades\DB;
 
 class CustomerResource extends Resource
 {
@@ -238,6 +239,9 @@ class CustomerResource extends Resource
 
     protected static function mutateFormDataBeforeCreate(array $data): array
     {
+        if (is_null($data)) {
+            throw new \Exception("Record creation failed");
+        }
         $userId = Auth::user()->id;
         $teamId = Filament::getTenant()->id;
 
@@ -260,6 +264,9 @@ class CustomerResource extends Resource
 
     protected static function mutateFormDataBeforeSave(array $data): array
     {
+        if (is_null($data)) {
+            throw new \Exception("Record creation failed");
+        }
         $userId = Auth::user()->id;
         $teamId = Filament::getTenant()->id;
 
@@ -282,6 +289,9 @@ class CustomerResource extends Resource
 
     public static function afterCreate($record, array $data)
     {
+        if (is_null($record)) {
+            throw new \Exception("Record creation failed");
+        }
         if (isset($data['contacts'])) {
             foreach ($data['contacts'] as $contactData) {
                 $record->contacts()->create($contactData);
@@ -297,6 +307,9 @@ class CustomerResource extends Resource
 
     public static function afterSave($record, array $data)
     {
+        if (is_null($record)) {
+            throw new \Exception("Record creation failed");
+        }
         $record->contacts()->delete();
         $record->banks()->delete();
 
