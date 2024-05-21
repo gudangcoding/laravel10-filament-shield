@@ -8,7 +8,6 @@ use App\Models\Customer;
 use App\Models\CustomerCategory;
 use App\Models\CustomerClass;
 use Filament\Facades\Filament;
-use Filament\Forms;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -21,10 +20,8 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Actions\Action;
-use App\Helpers\helper_nomor; // Tambahkan ini untuk mengimpor fungsi helper
+use App\Models\Alamat;
 
 class CustomerResource extends Resource
 {
@@ -35,7 +32,7 @@ class CustomerResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $user = Auth::user();
+        $userId = Auth::user()->id;
         $teamId = Filament::getTenant()->id;
 
         return $form
@@ -50,11 +47,11 @@ class CustomerResource extends Resource
                             ->label('Nama Customer'),
                         TextInput::make('daerah_customer')
                             ->label('Daerah Customer'),
-                        Select::make('customer_class')
+                        Select::make('customer_class_id')
+                            ->placeholder('cash/tempo')
                             ->label('Kelas Pelanggan')
                             ->searchable()
                             ->options(CustomerClass::all()->pluck('name', 'id'))
-                            ->placeholder('Pilih')
                             ->searchable()
                             ->preload()
                             ->createOptionForm([
@@ -68,11 +65,11 @@ class CustomerResource extends Resource
                                 $class = CustomerClass::create($data);
                                 return $class->id;
                             }),
-                        Select::make('customer_category')
+                        Select::make('customer_category_id')
                             ->label('Kategori Pelanggan')
+                            ->placeholder('toko/online')
                             ->searchable()
                             ->options(CustomerCategory::all()->pluck('name', 'id'))
-                            ->placeholder('Pilih')
                             ->createOptionForm([
                                 TextInput::make('name')
                                     ->label('Kelas Pelanggan')
@@ -111,57 +108,70 @@ class CustomerResource extends Resource
                         TextInput::make('jenis_badan_usaha')
                             ->label('Jenis Badan Usaha')
                             ->placeholder('PT/CV/UD Dll'),
-                        Hidden::make('uuid_customer'),
                         Hidden::make('team_id')->default($teamId),
-                        Hidden::make('user_id')->default($user->id)
+                        Hidden::make('user_id')->default($userId)
                     ]),
                 Tabs::make('Tab')
                     ->tabs([
                         Tabs\Tab::make('Info')
                             ->schema([
                                 Repeater::make('contacts')
+                                    ->relationship('contacts')
                                     ->schema([
                                         TextInput::make('no_hp')->label('No. HP'),
                                         TextInput::make('nama')->label('Nama'),
                                         TextInput::make('hubungan')->label('Hubungan'),
                                         TextInput::make('msg_app')->placeholder('WA/IG/LINE etc'),
+                                        Hidden::make('team_id')->default($teamId),
+                                        Hidden::make('user_id')->default($userId)
                                     ])
                                     ->columns(4)
                                     ->label('Contacts')
                                     ->addActionLabel('Tambah Kontak'),
                             ]),
-                        Tabs\Tab::make('Keterangan')
+                        Tabs\Tab::make('Alamat')
                             ->schema([
-                                Fieldset::make('Alamat Kirim')
+                                Repeater::make('alamats')
+                                    ->relationship('alamat')
                                     ->schema([
+                                        TextInput::make('label_alamat')->label('Label Alamat')->default('Pusat'),
                                         TextInput::make('negara')->label('Negara')->default('INDONESIA'),
                                         TextInput::make('provinsi')->label('Provinsi')->default('JAKARTA'),
                                         TextInput::make('kabupaten_kota')->label('Kabupaten/Kota')->default('JAKARTA BARAT'),
                                         TextInput::make('kecamatan')->label('Kecamatan')->default('DAAN MOGOT'),
                                         TextInput::make('kelurahan_desa')->label('Kelurahan/Desa')->default('KAPUK'),
                                         TextInput::make('rt_rw')->label('RT/RW')->default('001/01'),
-                                        TextInput::make('alamat')->label('Alamat')->default('Jl. PETERNAKAN II, Gg IKAN ASIN'),
+                                        Textarea::make('alamat')->label('Alamat')->default('Jl. PETERNAKAN II, Gg IKAN ASIN'),
                                         TextInput::make('no_unit')->label('No/Unit')->default('No.16'),
                                         TextInput::make('tambahan')->label('Tambahan')->default('KOMPLEK PERGUDANGAN NAGATA, GUDANG S3'),
                                         TextInput::make('kode_pos')->label('Kode Pos')->default('11420'),
-                                    ])
+                                        Hidden::make('team_id')->default($teamId),
+                                        Hidden::make('user_id')->default($userId)
+                                    ])->columns(4)
+
+
                             ]),
+
                         Tabs\Tab::make('Catatan')
                             ->icon('heroicon-o-bell')
                             ->schema([
-                                Textarea::make('perhatian')
+                                Textarea::make('catatan')
                                     ->label('Perhatian')
                                     ->placeholder("CONTOH: SUKA PESAN DIKIT2 MULTI SO\nCONTOH: SUKA BILANG KIRIMNYA KURANG BARANG"),
                             ]),
                         Tabs\Tab::make('Pembayaran')
                             ->schema([
                                 Repeater::make('banks')
+                                    ->relationship('banks')
                                     ->schema([
+                                        TextInput::make('nama_bank')->label('Nama Bank'),
                                         TextInput::make('atas_nama')->label('Atas Nama'),
                                         TextInput::make('alias')->label('Nama Alias'),
                                         TextInput::make('no_rek')->label('No Rekening'),
+                                        Hidden::make('team_id')->default($teamId),
+                                        Hidden::make('user_id')->default($userId)
                                     ])
-                                    ->columns(3)
+                                    ->columns(4)
                                     ->label('Info Rekening Bank')
                                     ->addActionLabel('Tambah Bank'),
                             ]),
@@ -179,11 +189,10 @@ class CustomerResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nama_customer')->label('Nama Customer')->searchable(),
+                Tables\Columns\TextColumn::make('jenis_badan_usaha')->label('Tipe Pelanggan')->searchable(),
                 Tables\Columns\TextColumn::make('daerah_customer')->label('Daerah Customer')->searchable(),
-                Tables\Columns\TextColumn::make('class')->label('Kelas')->searchable(),
-                Tables\Columns\TextColumn::make('category')->label('Kategori')->searchable(),
-                Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
-                Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable(),
+                Tables\Columns\TextColumn::make('kelas.name')->label('Kelas')->searchable(),
+                Tables\Columns\TextColumn::make('kategori_customer.name')->label('Kategori')->searchable(),
             ])
             ->filters([
                 // Add filters if necessary
@@ -214,20 +223,20 @@ class CustomerResource extends Resource
 
     protected static function mutateFormDataBeforeCreate(array $data): array
     {
-        $user = Auth::user();
+        $userId = Auth::user()->id;
         $teamId = Filament::getTenant()->id;
 
         if (isset($data['contacts'])) {
             foreach ($data['contacts'] as &$contact) {
                 $contact['team_id'] = $teamId;
-                $contact['user_id'] = $user->id;
+                $contact['user_id'] = $userId;
             }
         }
 
         if (isset($data['banks'])) {
             foreach ($data['banks'] as &$bank) {
                 $bank['team_id'] = $teamId;
-                $bank['user_id'] = $user->id;
+                $bank['user_id'] = $userId;
             }
         }
 
@@ -236,20 +245,20 @@ class CustomerResource extends Resource
 
     protected static function mutateFormDataBeforeSave(array $data): array
     {
-        $user = Auth::user();
+        $userId = Auth::user()->id;
         $teamId = Filament::getTenant()->id;
 
         if (isset($data['contacts'])) {
             foreach ($data['contacts'] as &$contact) {
                 $contact['team_id'] = $teamId;
-                $contact['user_id'] = $user->id;
+                $contact['user_id'] = $userId;
             }
         }
 
         if (isset($data['banks'])) {
             foreach ($data['banks'] as &$bank) {
                 $bank['team_id'] = $teamId;
-                $bank['user_id'] = $user->id;
+                $bank['user_id'] = $userId;
             }
         }
 

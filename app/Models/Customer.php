@@ -12,18 +12,19 @@ class Customer extends Model
         'kode_customer',
         'nama_customer',
         'daerah_customer',
-        'class',
-        'category',
+        'customer_class_id',
+        'customer_category_id',
         'sisa_limit_hutang',
         'total_hutang',
         'hutang_dlm_tempo',
         'hutang_lewat_tempo',
         'limit_nota',
         'limit_hutang',
+        'catatan',
         'jenis_badan_usaha',
-        'uuid_customer',
+        'tgl_beli',
         'team_id',
-        'user_id'
+        'user_id',
     ];
 
     public function contacts()
@@ -44,5 +45,19 @@ class Customer extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function alamat()
+    {
+        return $this->hasMany(Alamat::class);
+    }
+
+    public function kelas()
+    {
+        return $this->belongsTo(CustomerClass::class, 'customer_class_id');
+    }
+    public function kategori_customer()
+    {
+        return $this->belongsTo(CustomerCategory::class, 'customer_category_id');
     }
 }

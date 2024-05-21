@@ -8,4 +8,30 @@ use Illuminate\Database\Eloquent\Model;
 class Alamat extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'team_id',
+        'user_id',
+        'negara',
+        'kecamatan',
+        'kelurahan_desa',
+        'rt_rw',
+        'alamat',
+        'no_unit',
+        'tambahan',
+        'kode_pos',
+        'label_alamat',
+    ];
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

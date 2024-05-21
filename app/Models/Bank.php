@@ -10,10 +10,17 @@ class Bank extends Model
     use HasFactory;
 
     protected $fillable = [
-        'customer_id', 'atas_nama', 'alias', 'no_rek'
+        'team_id',
+        'user_id',
+        'customer_id',
+        'nama_bank',
+        'atas_nama',
+        'alias',
+        'no_rek'
     ];
 
     public function customer()
+
     {
         return $this->belongsTo(Customer::class);
     }

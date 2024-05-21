@@ -83,7 +83,6 @@ class ProductResource extends Resource
                         //     ->label('Format Satuan')
                         //     ->default('Ctn/Box/Card/Pcs')
                         //     ->helperText('COntoh : Ctn/Box/Card/Pcs'),
-                        TextInput::make('uuid')->label('UUID'),
                         TextInput::make('id_produk')->label('ID Produk'),
                         TextInput::make('nama_produk_cn')->label('Nama Produk (Cn)'),
                         // ->helperText('Nama Produk Versi Bahasa Cina'),
@@ -94,15 +93,26 @@ class ProductResource extends Resource
                         // ->mask('Ctn/Dz/card/Pcs')
                         // ->placeholder('/'),
                         //
-                        // TextInput::make('data')
-                        //     ->label('Data')
-                        //     ->mask('----/----/----/----') // Initial mask for the format
-                        //     ->rules(['regex:/^\d{4}\/\d{4}\/\d{4}\/\d{4}$/']) // Regex validation for the format
-                        // ,
-                        TextInput::make('tes')
-                            ->mask(RawJs::make('$money($input)'))
-                            ->stripCharacters(','),
-                        TextInput::make('category_id')->label('Kategori'),
+                        // Format Uang
+                        // TextInput::make('tes')
+                        //     ->mask(RawJs::make('$money($input)'))
+                        //     ->stripCharacters(','),
+                        Select::make('category_id')
+                            ->label('Kategori Produk')
+                            ->placeholder('toko/online')
+                            ->searchable()
+                            ->options(Category::all()->pluck('name', 'id'))
+                            ->createOptionForm([
+                                TextInput::make('category_id')
+                                    ->label('Kategori')
+                                    ->required()
+                                    ->maxLength(255),
+                            ])
+                            ->createOptionAction(fn ($action) => $action->modalWidth('sm'))
+                            ->createOptionUsing(function ($data) {
+                                $cus_cat = Category::create($data);
+                                return $cus_cat->id;
+                            }),
                         TextInput::make('deskripsi')->label('Deskripsi'),
                         Toggle::make('aktif')
                             ->label('Aktif'),

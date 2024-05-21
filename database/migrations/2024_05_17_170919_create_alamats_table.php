@@ -13,6 +13,20 @@ return new class extends Migration
     {
         Schema::create('alamats', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('customer_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->string('label_alamat')->default('Pusat');
+            $table->string('negara')->default('INDONESIA');
+            $table->string('provinsi');
+            $table->string('kabupaten_kota');
+            $table->string('kecamatan');
+            $table->string('kelurahan_desa');
+            $table->string('rt_rw');
+            $table->string('alamat');
+            $table->string('no_unit');
+            $table->string('tambahan');
+            $table->string('kode_pos');
             $table->timestamps();
         });
     }

@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('banks', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('customer_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->string('nama_bank')->nullable();
+            $table->string('atas_nama')->nullable();
+            $table->string('alias')->nullable();
+            $table->string('no_rek')->nullable();
             $table->timestamps();
         });
     }
