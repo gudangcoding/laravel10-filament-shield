@@ -4,49 +4,56 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateProductsTable extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('category_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->string('gambar')->nullable();
-            $table->string('nama_produk_cina');
+            $table->string('gambar_produk')->nullable();
+            $table->string('kode_produk')->unique();
+            $table->string('nama_produk_cn')->nullable();
             $table->string('nama_produk');
-            $table->string('format_satuan')->nullable();
-            $table->string('slug')->nullable();
-            $table->string('deskripsi')->nullable();
-            $table->string('tag')->nullable();
-            $table->boolean('aktif')->default(false);
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->text('deskripsi')->nullable();
+            $table->boolean('aktif')->default(true);
+            $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->integer('ctn')->default(1);
+            $table->decimal('price_ctn', 15, 2)->default(1);
+            $table->integer('box')->default(1);
+            $table->decimal('price_box', 15, 2)->default(1);
+            $table->integer('lusin')->default(1);
+            $table->decimal('price_lsn', 15, 2)->default(1);
+            $table->integer('pack')->default(1);
+            $table->decimal('price_pack', 15, 2)->default(1);
+            $table->integer('pcs')->default(1);
+            $table->decimal('price_pcs', 15, 2)->default(1);
+            $table->integer('stok')->default(0);
+            $table->integer('minimum_stok')->default(0);
+            $table->integer('jumlah_terjual')->default(0);
+            $table->decimal('pendapatan_penjualan', 15, 2)->default(0);
+            $table->integer('jumlah_dibeli')->default(0);
+            $table->decimal('biaya_pembelian', 15, 2)->default(0);
+            $table->decimal('bea_masuk', 15, 2)->default(0);
+            $table->decimal('bea_keluar', 15, 2)->default(0);
             $table->timestamps();
-        });
-
-        Schema::create('product_variants', function (Blueprint $table) {
-            $table->uuid();
-            $table->foreignId('product_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->string('gambar')->nullable();
-            $table->integer('harga')->nullable();
-            $table->string('satuan')->nullable();
-            $table->string('ukuran_kemasan')->nullable();
-            $table->integer('isi')->nullable();
-            $table->integer('stok');
-            $table->boolean('aktif')->default(false);
-            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('product_price');
         Schema::dropIfExists('products');
     }
-};
+}

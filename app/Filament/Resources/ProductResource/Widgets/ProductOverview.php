@@ -16,10 +16,10 @@ class ProductOverview extends BaseWidget
             Stat::make('All Product', Product::all()->count())
                 ->description('Semua Produk')
                 ->descriptionIcon('heroicon-o-cube'),
-            Stat::make('Variant Product', ProductVariant::all()->count())
+            Stat::make('Variant Product', Product::all()->count())
                 ->description('Variasi Produk')
                 ->descriptionIcon('heroicon-o-cube'),
-            Stat::make('Total Stok', ProductVariant::sum('stok'))
+            Stat::make('Total Stok', Product::sum('stok'))
                 ->description('Total Stok Produk')
                 ->descriptionIcon('heroicon-o-cube'),
         ];

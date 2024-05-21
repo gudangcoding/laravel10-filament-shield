@@ -13,6 +13,7 @@
         "filament/filament": "^3.2",
         "filament/forms": "^3.2",
         "filament/notifications": "^3.2",
+        "filament/spatie-laravel-media-library-plugin": "^3.2",
         "filament/tables": "^3.2",
         "guzzlehttp/guzzle": "^7.2",
         "konnco/filament-import": "*",

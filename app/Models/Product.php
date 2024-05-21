@@ -6,20 +6,40 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Product extends Model
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+
+class Product extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
     protected $fillable = [
-        "team_id",
-        "user_id",
-        "name",
-        "slug",
-        "satuan",
-        "kategori",
-        "deskripsi",
-        "gambar",
-        "harga",
-        "stok",
+        'gambar_produk',
+        'kode_produk',
+        'nama_produk_cn',
+        'nama_produk',
+        'category_id',
+        'deskripsi',
+        'aktif',
+        'team_id',
+        'user_id',
+        'ctn',
+        'price_ctn',
+        'box',
+        'price_box',
+        'lusin',
+        'price_lsn',
+        'pack',
+        'price_pack',
+        'pcs',
+        'price_pcs',
+        'stok',
+        'minimum_stok',
+        'jumlah_terjual',
+        'pendapatan_penjualan',
+        'jumlah_dibeli',
+        'biaya_pembelian',
+        'bea_masuk',
+        'bea_keluar'
     ];
 
     public function category()
@@ -35,5 +55,16 @@ class Product extends Model
     public function ProductVariant()
     {
         return $this->hasMany(\App\Models\ProductVariant::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('aktif', true);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('product')
+            ->useDisk('public');
     }
 }

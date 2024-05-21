@@ -55,12 +55,12 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
-        'product_images' => [
-            'driver' => 'local',
-            'root' => storage_path('app/public/product_images'), // Lokasi direktori penyimpanan
-            'url' => env('APP_URL') . '/storage/product_images', // URL untuk mengakses file
-            'visibility' => 'public',
-        ],
+        // 'product_images' => [
+        //     'driver' => 'local',
+        //     'root' => storage_path('app/public/product'), // Lokasi direktori penyimpanan
+        //     'url' => env('APP_URL') . '/storage/product', // URL untuk mengakses file
+        //     'visibility' => 'public',
+        // ],
 
     ],
 

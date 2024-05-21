@@ -15,6 +15,7 @@ class Contacts extends Model
         'customer_id',
         'no_hp',
         'nama',
+        // 'sebutan',
         'hubungan',
         'msg_app'
     ];

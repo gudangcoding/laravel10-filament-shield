@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
-use App\Filament\Resources\ProductResource\RelationManagers\ProductVariantRelationManager;
+// use App\Filament\Resources\ProductResource\RelationManagers\ProductVariantRelationManager;
 use App\Filament\Resources\ProductResource\Widgets\ProductOverview;
 use App\Models\Category;
 use App\Models\Product;
@@ -31,9 +31,13 @@ use Illuminate\Support\Str;
 use App\Models\Team;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tab;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Support\RawJs;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 
 class ProductResource extends Resource
 {
@@ -63,57 +67,44 @@ class ProductResource extends Resource
                 Section::make('Product Form')
                     ->columns(4)
                     ->schema([
-                        // FileUpload::make('gambar')
-                        //     ->directory('product'),
-                        // TextInput::make('name')
-                        //     ->live(onBlur: true)
-                        //     ->afterStateUpdated(
-                        //         fn (Set $set, ?string $state) =>
-                        //         $set('slug', Str::slug($state))
-                        //     )
-                        //     ->label('Name')
-                        //     ->required(),
-                        // TextInput::make('slug')->label('Slug'),
-                        // Select::make('category_id')
-                        //     ->label('Kategori')
-                        //     ->options(Category::pluck('name', 'id')->toArray())
-                        //     ->default($form->getRecord()->category_id ?? null),
-                        // TextInput::make('deskripsi')->label('Deskripsi'),
-                        // TextInput::make('format_satuan')
-                        //     ->label('Format Satuan')
-                        //     ->default('Ctn/Box/Card/Pcs')
-                        //     ->helperText('COntoh : Ctn/Box/Card/Pcs'),
-                        TextInput::make('id_produk')->label('ID Produk'),
-                        TextInput::make('nama_produk_cn')->label('Nama Produk (Cn)'),
-                        // ->helperText('Nama Produk Versi Bahasa Cina'),
-                        TextInput::make('nama_produk')->label('Nama Produk (ID)'),
-                        // ->helperText('Nama Produk Versi Bahasa Indonesia'),
-                        // TextInput::make('tag')->label('Tag')
-                        //     ->mask('/'),
-                        // ->mask('Ctn/Dz/card/Pcs')
-                        // ->placeholder('/'),
-                        //
-                        // Format Uang
-                        // TextInput::make('tes')
-                        //     ->mask(RawJs::make('$money($input)'))
-                        //     ->stripCharacters(','),
+                        FileUpload::make('gambar_produk')
+                            ->disk('public')
+                            ->directory('product')
+                            ->image()
+                            ->required(),
+                        // SpatieMediaLibraryFileUpload::make('gambar_produk')->image(),
+
+                        TextInput::make('kode_produk')
+                            ->label('Kode Produk')
+                            ->required(),
+                        TextInput::make('nama_produk_cn')
+                            ->label('Nama Produk (Cn)'),
+                        TextInput::make('nama_produk')
+                            ->label('Nama Produk (ID)')
+                            ->required(),
                         Select::make('category_id')
                             ->label('Kategori Produk')
-                            ->placeholder('toko/online')
+                            ->placeholder('Pilih')
                             ->searchable()
                             ->options(Category::all()->pluck('name', 'id'))
                             ->createOptionForm([
-                                TextInput::make('category_id')
+                                TextInput::make('name')
                                     ->label('Kategori')
                                     ->required()
                                     ->maxLength(255),
                             ])
                             ->createOptionAction(fn ($action) => $action->modalWidth('sm'))
                             ->createOptionUsing(function ($data) {
-                                $cus_cat = Category::create($data);
-                                return $cus_cat->id;
+                                $existingCategory = Category::where('name', $data['name'])->first();
+
+                                if ($existingCategory) {
+                                    return "Kategori sudah ada";
+                                } else {
+                                    $newCategory = Category::create($data);
+                                    return $newCategory->id;
+                                }
                             }),
-                        TextInput::make('deskripsi')->label('Deskripsi'),
+                        Textarea::make('deskripsi')->label('Deskripsi'),
                         Toggle::make('aktif')
                             ->label('Aktif'),
                         Hidden::make('team_id')->default($teamId),
@@ -126,14 +117,44 @@ class ProductResource extends Resource
 
                     ->tabs([
                         Tabs\Tab::make('Harga')
-                            ->model(Product::class) // target input data
+                            ->model(Product::class)
 
                             ->schema([
-                                // Field form terkait harga
-                                TextInput::make('harga_jual')->label('Harga Jual'),
-                                TextInput::make('harga_beli')->label('Harga Beli'),
-                                // ... field form lainnya
-                            ]),
+                                TextInput::make('ctn')
+                                    ->label('Carton')
+                                    ->Default(1),
+                                TextInput::make('price_ctn')
+                                    ->label('Harga/Ctn')
+                                    ->Default(1),
+                                TextInput::make('box')
+                                    ->label('Box')
+                                    ->Default(1),
+                                TextInput::make('price_box')
+                                    ->label('Harga/box')
+                                    ->Default(1),
+                                TextInput::make('lusin')
+                                    ->label('Lusin')
+                                    ->Default(1),
+                                TextInput::make('price_lsn')
+                                    ->label('Harga/Lusin')
+                                    ->Default(1),
+                                TextInput::make('pack')
+                                    ->label('Pack')
+                                    ->Default(1),
+                                TextInput::make('price_pack')
+                                    ->label('Harga/Pack')
+                                    ->Default(1),
+                                TextInput::make('pcs')
+                                    ->label('Pcs')
+                                    ->Default(1),
+                                TextInput::make('price_pcs')
+                                    ->mask(RawJs::make('$money($input)'))
+                                    ->stripCharacters(',')
+                                    ->label('Harga/pcs')
+                                    ->Default(1),
+
+
+                            ])->columns(10),
 
                         Tabs\Tab::make('Inventori')
                             ->model(Product::class) // target input data
@@ -195,11 +216,15 @@ class ProductResource extends Resource
                 }
             })
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                ImageColumn::make('gambar_produk')
+                    ->label('Gambar Produk')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('nama_produk')
                     ->label('Nama')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('category.name')
+                TextColumn::make('category.name')
                     ->label('Kategori')
                     ->sortable(),
 
@@ -222,7 +247,7 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ProductVariantRelationManager::class,
+            // ProductVariantRelationManager::class,
         ];
     }
 

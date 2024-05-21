@@ -118,6 +118,21 @@ class CustomerResource extends Resource
                                 Repeater::make('contacts')
                                     ->relationship('contacts')
                                     ->schema([
+                                        Select::make('sebutan')
+                                            ->label('Sebutan')
+                                            ->options([
+                                                'pa' => 'Pa',
+                                                'pak' => 'Pak',
+                                                'bu' => 'Bu',
+                                                'ibu' => 'Ibu',
+                                                'ko' => 'Ko',
+                                                'ci' => 'Ci',
+                                                'bang' => 'Bang',
+                                                'mba' => 'Mba',
+                                                'h' => 'H',
+                                                'hj' => 'Hj',
+                                                'tk' => 'Tk'
+                                            ]),
                                         TextInput::make('no_hp')->label('No. HP'),
                                         TextInput::make('nama')->label('Nama'),
                                         TextInput::make('hubungan')->label('Hubungan'),
@@ -125,7 +140,7 @@ class CustomerResource extends Resource
                                         Hidden::make('team_id')->default($teamId),
                                         Hidden::make('user_id')->default($userId)
                                     ])
-                                    ->columns(4)
+                                    ->columns(5)
                                     ->label('Contacts')
                                     ->addActionLabel('Tambah Kontak'),
                             ]),
