@@ -21,6 +21,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\CustomerResource;
+use Filament\Support\Enums\MaxWidth;
 
 class SalesOrderResource extends Resource
 {
@@ -67,9 +68,10 @@ class SalesOrderResource extends Resource
                                     $set('customer_category_id', null);
                                 }
                             })
-                            // ->relationship('author', 'name')
-                            ->createOptionForm(fn (Form $form) => CustomerResource::form($form) ?? []),
-                        // ->editOptionForm(fn (Form $form) => CustomerResource::form($form) ?? []),
+                            ->relationship('customer', 'customer_id')
+                            ->createOptionForm(fn (Form $form) => CustomerResource::form($form) ?? [])
+                            ->editOptionForm(fn (Form $form) => CustomerResource::form($form) ?? [])
+                            ->createOptionAction(fn ($action) => $action->modalWidth(MaxWidth::FiveExtraLarge)),
 
                         TextInput::make('customer_class_id')
                             ->label('Class')
