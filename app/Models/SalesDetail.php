@@ -12,15 +12,20 @@ class SalesDetail extends Model
     protected $fillable = [
         'sales_order_id',
         'product_id',
-        'satuan_id',
+        'satuan',
         'harga',
         'qty',
-        'subtotal'
+        'subtotal',
+        'koli'
     ];
 
     public function salesOrder()
     {
-        // return $this->BelongsToMany(\App\Models\SalesOrder::class);
-        return $this->BelongsToMany(\App\Models\SalesOrder::class, 'sales_id');
+        return $this->BelongsToMany(SalesOrder::class, 'sales_order_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
     }
 }

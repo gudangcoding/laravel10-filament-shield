@@ -15,29 +15,29 @@ class SalesOrder extends Model
         'so_no',
         'team_id',
         'user_id',
-        'satuan_id',
         'total_amount',
         'total_barang',
+        'tanggal',
     ];
 
     public function product()
     {
-        return $this->belongsTo(\App\Models\Product::class, 'product_id');
+        return $this->belongsTo(Product::class, 'product_id');
     }
 
     public function team(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Team::class);
+        return $this->belongsTo(Team::class);
     }
 
     public function order_details()
     {
-        return $this->hasMany(\App\Models\SalesDetail::class);
+        return $this->hasMany(SalesDetail::class);
     }
 
     public function customer()
     {
-        return $this->belongsTo(\App\Models\Customer::class, 'customer_id');
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 
     public function SalesDetail(): HasMany

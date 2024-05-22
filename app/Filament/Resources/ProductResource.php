@@ -55,7 +55,10 @@ class ProductResource extends Resource
         return Product::count();
     }
 
-
+    protected function getModalWidth(): string
+    {
+        return 'screen'; // Atau 'sm', 'md', 'lg', 'xl','screen' sesuai kebutuhan Anda
+    }
 
 
     public static function form(Form $form): Form
@@ -64,14 +67,16 @@ class ProductResource extends Resource
         $teamId = Filament::getTenant()->id; //$user->currentTeam->id
         return $form
             ->schema([
+
                 Section::make('Product Form')
+                    ->label('Cari Produk')
                     ->columns(4)
                     ->schema([
                         FileUpload::make('gambar_produk')
                             ->disk('public')
                             ->directory('product')
-                            ->image()
-                            ->required(),
+                            ->image(),
+                        // ->required(),
                         // SpatieMediaLibraryFileUpload::make('gambar_produk')->image(),
 
                         TextInput::make('kode_produk')

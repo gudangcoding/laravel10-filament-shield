@@ -41,7 +41,7 @@ class SalesOrderResource extends Resource
                     ->schema([
 
 
-                        TextInput::make('no_so')
+                        TextInput::make('so_no')
                             ->label('No.SO')
                             ->default('SO_' .  date('ymd') . "_" . str_pad(SalesOrder::max('id') + 1, 4, '0', STR_PAD_LEFT)),
                         Select::make('customer_id')
@@ -68,7 +68,7 @@ class SalesOrderResource extends Resource
                                     $set('customer_category_id', null);
                                 }
                             })
-                            ->relationship('customer', 'customer_id')
+                            ->relationship('customer', 'nama_customer')
                             ->createOptionForm(fn (Form $form) => CustomerResource::form($form) ?? [])
                             ->editOptionForm(fn (Form $form) => CustomerResource::form($form) ?? [])
                             ->createOptionAction(fn ($action) => $action->modalWidth(MaxWidth::FiveExtraLarge)),
@@ -88,8 +88,6 @@ class SalesOrderResource extends Resource
                             ->native(false)
                             ->displayFormat('d/m/Y')
                     ])->columns(5),
-
-
             ]);
     }
 
