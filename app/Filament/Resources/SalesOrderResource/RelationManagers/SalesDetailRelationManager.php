@@ -103,7 +103,7 @@ class SalesDetailRelationManager extends RelationManager
                     ->label('Product')
                     ->options(function () {
                         // Ambil semua id produk yang sudah ada di 'sales_detail'
-                        $existingProductIds = SalesDetail::pluck('product_id')->toArray();
+                        $existingProductIds = SalesDetail::whereNotNull('id')->pluck('product_id')->toArray();
 
                         // Kueri produk yang tidak termasuk dalam daftar id yang sudah ada
                         $products = Product::query()
@@ -141,8 +141,7 @@ class SalesDetailRelationManager extends RelationManager
                     ->createOptionForm(fn (Form $form) => ProductResource::form($form) ?? [])
                     ->editOptionForm(fn (Form $form) => ProductResource::form($form) ?? [])
                     ->distinct()
-
-                    ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                    // ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                     ->columnSpan(['md' => 1])
                     ->searchable(),
                 TextInput::make('qty')
@@ -232,7 +231,7 @@ class SalesDetailRelationManager extends RelationManager
                             Select::make('koli')
                                 ->label('Koli')
                                 ->options(function () {
-                                    $koliExisting = SalesDetail::pluck('koli')->toArray();
+                                    $koliExisting = SalesDetail::whereNotNull('koli')->pluck('koli')->toArray();
                                     $lastKoli = max($koliExisting);
                                     $nextKoli = $lastKoli ? $lastKoli + 1 : 1;
 
