@@ -27,10 +27,10 @@ return new class extends Migration
             $table->foreignId('sales_order_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('satuan')->nullable();
-            $table->decimal('harga', 8, 2)->nullable();
+            $table->decimal('harga', 16, 2)->nullable();
             $table->integer('qty')->nullable();
             $table->integer('koli')->nullable();
-            $table->decimal('subtotal', 8, 2)->nullable();
+            $table->decimal('subtotal', 16, 2)->nullable();
             $table->timestamps();
         });
     }

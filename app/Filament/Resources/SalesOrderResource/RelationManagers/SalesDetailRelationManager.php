@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SalesOrderResource\RelationManagers;
 
+use App\Filament\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\SalesDetail;
 use Filament\Actions\Action;
@@ -15,7 +16,9 @@ use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\Summarizers\Count;
 use Filament\Tables\Columns\Summarizers\Sum;
+use Filament\Tables\Columns\Summarizers\Summarizer;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,74 +28,6 @@ use Illuminate\Database\Eloquent\Collection;
 class SalesDetailRelationManager extends RelationManager
 {
     protected static string $relationship = 'SalesDetail';
-    public function table(Table $table): Table
-    {
-        return $table
-            ->defaultGroup('koli')
-            ->groupRecordsTriggerAction(
-                fn (Action $action) => $action
-                    ->button()
-                    ->label('Group records'),
-            )
-            ->recordTitleAttribute('product_id')
-            ->columns([
-                ImageColumn::make('gambar_produk')
-                    ->label('Gambar'),
-                TextColumn::make('product.nama_produk')
-                    ->label('Nama Produk'),
-                TextColumn::make('harga')
-                    ->label('Harga'),
-                TextColumn::make('satuan')
-                    ->label('Satuan'),
-                TextColumn::make('qty')
-                    ->label('Qty'),
-                TextColumn::make('koli')
-                    ->label('Koli'),
-            ])
-            ->filters([
-                //
-            ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make(),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-
-                Tables\Actions\BulkActionGroup::make([
-                    BulkAction::make('Satukan Koli')
-                        ->icon('heroicon-m-check')
-                        ->requiresConfirmation()
-                        ->form([
-
-                            Select::make('koli')
-                                ->label('Koli')
-                                ->options(function () {
-                                    $lastKoli = SalesDetail::max('koli');
-                                    // $koli = SalesDetail::select('koli');
-                                    $nextKoli = $lastKoli ? $lastKoli + 1 : 1;
-                                    return [
-                                        null => 'Keluarkan', // Adding null as the first option
-                                        $lastKoli => $lastKoli,
-                                        $nextKoli => $nextKoli
-                                    ];
-                                })
-                                ->default(null)
-                                ->distinct(),
-                        ])
-                        ->action(function (Collection $records, array $data) {
-                            $records->each(function ($record) use ($data) {
-                                SalesDetail::where('id', $record->id)->update(['koli' => $data['koli']]);
-                            });
-                        }),
-
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-
-            ]);
-    }
 
     public function form(Form $form): Form
     {
@@ -133,9 +68,51 @@ class SalesDetailRelationManager extends RelationManager
                         }
                     })
                     ->columnSpan(1),
+                // Select::make('product_id')
+                //     ->label('Product')
+                //     ->options(Product::query()->pluck('nama_produk', 'id'))
+                //     ->required()
+                //     ->live(onBlur: true)
+                //     ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
+                //         $ketemu = Product::find($state);
+                //         if ($ketemu) {
+                //             $satuan = $get('satuan');
+                //             $harga = match ($satuan) {
+                //                 'ctn' => $ketemu->price_ctn,
+                //                 'box' => $ketemu->price_box,
+                //                 'bag' => $ketemu->price_bag,
+                //                 'card' => $ketemu->price_card,
+                //                 'lusin' => $ketemu->price_lsn,
+                //                 'pack' => $ketemu->price_pack,
+                //                 'pcs' => $ketemu->price_pcs,
+                //                 default => 0,
+                //             };
+                //             $subtotal = $get('qty') * $harga;
+                //             $set('harga', $harga);
+                //             $set('subtotal', $subtotal);
+                //         } else {
+                //             $set('harga', 0);
+                //             $set('subtotal', 0);
+                //         }
+                //     })
+                //     ->distinct()
+                //     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                //     ->columnSpan(['md' => 1])
+                //     ->searchable(),
                 Select::make('product_id')
                     ->label('Product')
-                    ->options(Product::query()->pluck('nama_produk', 'id'))
+                    ->options(function () {
+                        // Ambil semua id produk yang sudah ada di 'sales_detail'
+                        $existingProductIds = SalesDetail::pluck('product_id')->toArray();
+
+                        // Kueri produk yang tidak termasuk dalam daftar id yang sudah ada
+                        $products = Product::query()
+                            ->whereNotIn('id', $existingProductIds)
+                            ->pluck('nama_produk', 'id');
+
+                        return $products;
+                    })
+                    // Sisipkan logika lain seperti biasa
                     ->required()
                     ->live(onBlur: true)
                     ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
@@ -160,7 +137,11 @@ class SalesDetailRelationManager extends RelationManager
                             $set('subtotal', 0);
                         }
                     })
+                    ->relationship('product', 'nama_produk')
+                    ->createOptionForm(fn (Form $form) => ProductResource::form($form) ?? [])
+                    ->editOptionForm(fn (Form $form) => ProductResource::form($form) ?? [])
                     ->distinct()
+
                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                     ->columnSpan(['md' => 1])
                     ->searchable(),
@@ -171,28 +152,151 @@ class SalesDetailRelationManager extends RelationManager
                     ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
                         $harga = $get('harga');
                         $subtotal = $harga * $state;
-                        $set('subtotal', number_format($subtotal, 2, '.', ''));
+                        $set('subtotal', $subtotal);
                     })
                     ->required()
                     ->columnSpan(1),
                 TextInput::make('harga')
-                    ->mask(RawJs::make('$money($input)'))
-                    ->stripCharacters(',')
+                    // ->mask(RawJs::make('$money($input)'))
+                    // ->stripCharacters(',')
                     ->columnSpan(1)
                     ->label('Unit Price')
                     ->required()
-                    ->disabled(),
+                    ->readOnly(),
                 TextInput::make('subtotal')
-                    ->mask(RawJs::make('$money($input)'))
-                    ->stripCharacters(',')
+                    // ->mask(RawJs::make('$money($input)'))
+                    // ->stripCharacters(',')
                     ->numeric()
                     ->columnSpan(1)
                     ->label('Subtotal')
                     ->default(function ($state, Forms\Set $set, Get $get) {
-                        return number_format($get('qty') * $get('harga'), 2, '.', '');
+                        return $get('qty') * $get('harga');
                     })
-                    ->disabled(),
+                    ->readOnly(),
 
             ])->columns(5);
+    }
+    public function table(Table $table): Table
+    {
+        return $table
+            ->defaultGroup('koli')
+            ->groupRecordsTriggerAction(
+                fn (Action $action) => $action
+                    ->button()
+                    ->label('Group records'),
+            )
+            ->recordTitleAttribute('product_id')
+            ->columns([
+                ImageColumn::make('gambar_produk')
+                    ->label('Gambar'),
+                TextColumn::make('product.nama_produk')
+                    ->label('Nama Produk'),
+                TextColumn::make('harga')
+                    ->label('Harga'),
+                TextColumn::make('satuan')
+                    ->label('Satuan'),
+                TextColumn::make('qty')
+                    ->label('Qty'),
+                TextColumn::make('subtotal')
+                    ->money('IDR', locale: 'id')
+                    ->label('SubTotal'),
+                TextColumn::make('kolian')
+                    // ->summarize(Count::make())
+                    // ->summarize([
+                    //     Tables\Columns\Summarizers\Count::make(),
+                    // ])
+                    ->label('Koli')
+                    ->default(1),
+            ])
+
+            ->filters([
+                //
+            ])
+            ->headerActions([
+
+                Tables\Actions\CreateAction::make(),
+            ])
+
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+
+                Tables\Actions\BulkActionGroup::make([
+                    BulkAction::make('Satukan Koli')
+                        ->icon('heroicon-m-check')
+                        ->requiresConfirmation()
+                        ->form([
+
+                            Select::make('koli')
+                                ->label('Koli')
+                                ->options(function () {
+                                    $koliExisting = SalesDetail::pluck('koli')->toArray();
+                                    $lastKoli = max($koliExisting);
+                                    $nextKoli = $lastKoli ? $lastKoli + 1 : 1;
+
+                                    $options = [
+                                        null => 'Keluarkan',
+                                    ];
+
+                                    foreach ($koliExisting as $koli) {
+                                        $options[$koli] = $koli;
+                                    }
+
+                                    $options[$nextKoli] = $nextKoli;
+
+                                    return $options;
+                                })
+                                ->default(null)
+                                ->distinct(),
+
+                            // Select::make('koli')
+                            //     ->label('Koli')
+                            //     ->options(function (SalesDetail $record) {
+                            //         $salesOrderId = $record->getKey();
+                            //         // $salesOrderId = $record->sales_order_id;
+                            //         if (!$salesOrderId) {
+                            //             return [
+                            //                 null => 'Keluarkan',
+                            //             ];
+                            //         }
+
+                            //         $koliOptions = SalesDetail::where('sales_order_id', $salesOrderId)
+                            //             ->select('koli')
+                            //             ->distinct()
+                            //             ->pluck('koli')
+                            //             ->toArray();
+
+                            //         $options = [
+                            //             null => 'Keluarkan',
+                            //         ];
+
+                            //         foreach ($koliOptions as $koli) {
+                            //             $options[$koli] = $koli;
+                            //         }
+
+                            //         $lastKoli = SalesDetail::where('sales_order_id', $salesOrderId)->max('koli');
+                            //         $nextKoli = $lastKoli ? $lastKoli + 1 : 1;
+                            //         $options[$nextKoli] = $nextKoli;
+
+                            //         return $options;
+                            //     })
+                            //     ->default(null)
+                            //     ->distinct(),
+                        ])
+                        ->action(function (Collection $records, array $data) {
+                            $records->each(function ($record) use ($data) {
+                                SalesDetail::where('id', $record->id)->update(['koli' => $data['koli']]);
+                            });
+                        }),
+
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+
+            ]);
+        // ->contentFooter(view('filament.components.table-footer-order'));
+        // ->footer(view('filament.components.table-footer-order'));
+        // ->view("filament.components.table-footer-order");
     }
 }
