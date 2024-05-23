@@ -7,6 +7,7 @@ use App\Filament\Resources\SalesOrderResource;
 use Filament\Actions;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class CreateSalesOrder extends CreateRecord
 {

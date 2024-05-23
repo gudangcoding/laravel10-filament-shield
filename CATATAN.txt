@@ -239,3 +239,60 @@ Customer
                 //     ])
 
 
+// Dua Kolom
+Section::make()
+                    ->columns([
+                        'sm' => 6,
+                        'xl' => 6,
+                        '2xl' => 8,
+                    ])
+                    ->schema([
+                        Card::make('Data Produk')
+                            ->columnSpan([
+                                'md' => 4,
+                            ])
+                            ->schema([]),
+                        Card::make('Total Belanja')
+                            ->columnSpan([
+                                'md' => 4,
+                            ])
+                            ->schema([]),
+                    ]),
+
+
+//memanggil form lain dari form aktif
+//kategori selected
+Select::make('Kategori')
+    ->reactive()
+    ->relationship('customer')
+    ->options(function ($get) {
+        $customerId = $get('customer_id');
+        $customerClass = CustomerCategory::where('id', $customerId)->pluck('name', 'id')->first();
+        $selected = [$customerId => $customerClass];
+        return $selected;
+    })
+    ->createOptionForm(fn (Form $form) => CustomerCategoryResource::form($form) ?? [])
+    ->editOptionForm(fn (Form $form, $get) => CustomerCategoryResource::form($form)
+    ->model(CustomerCategory::find($get('customer_id'))) ?? [])
+
+    //menampilkan data saat pertama kali Load
+    Placeholder::make('amounts')
+    ->label('Total Belanja')
+    ->reactive()
+    ->content(function ($get) {
+        $sum = SalesDetail::where('sales_order_id', $get('id'))->sum('subtotal');
+        return number_format($sum) ?? 0;
+    }),
+TextInput::make('amounts')
+    ->readOnly()
+    ->label('Total Belanja')
+    ->reactive()
+    ->afterStateHydrated(function ($set, $get) {
+        $salesOrderId = $get('id');
+        if ($salesOrderId) {
+            $sum = SalesDetail::where('sales_order_id', $salesOrderId)->sum('subtotal');
+            $formattedSum = $sum ? number_format($sum) : 0;
+            $set('amounts', $formattedSum);
+        }
+    }),
+

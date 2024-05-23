@@ -8,6 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Tabel\Actions\Action;
 use Filament\Tables\Columns\Summarizers\Summarizer;
+use Illuminate\Contracts\Support\Htmlable;
 
 class EditSalesOrder extends EditRecord
 {
@@ -25,5 +26,11 @@ class EditSalesOrder extends EditRecord
         return [
             Summarizer::make('koli')->label('Total Koli'),
         ];
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+
+        return "Form Detail Order ";
     }
 }

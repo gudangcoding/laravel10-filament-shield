@@ -21,73 +21,214 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\CustomerResource;
+use App\Models\CustomerCategory;
+use App\Models\CustomerClass;
+use App\Models\SalesDetail;
+use Doctrine\DBAL\Schema\Schema;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Textarea;
 use Filament\Support\Enums\MaxWidth;
+use Filament\Support\RawJs;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Reactive;
 
 class SalesOrderResource extends Resource
 {
     protected static ?string $model = SalesOrder::class;
     protected static ?string $ownershipRelationship = "salesOrders";
     protected static ?string $tenantOwnershipRelationshipName = "team";
+    protected static ?string $navigationGroup = "Marketing";
     protected static ?string $label = 'Sales Order';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
 
+        $user = Auth::user();
+        $userId = $user->id;
         return $form
             ->schema([
                 Section::make()
-
+                    ->columns([
+                        'sm' => 6,
+                        'xl' => 6,
+                        '2xl' => 8,
+                    ])
                     ->schema([
+                        Card::make('Data Pelanggan')
+                            ->columnSpan([
+                                'md' => 4,
+                            ])
+                            ->schema([
+                                Hidden::make('user_id')
+                                    ->default($userId),
+                                TextInput::make('so_no')
+                                    ->label('No.SO')
+                                    ->default('SO-' .  date('ymd') . "-" . str_pad(SalesOrder::max('id') + 1, 4, '0', STR_PAD_LEFT)),
+                                Select::make('customer_id')
+                                    ->label('Nama Pelanggan')
+                                    ->placeholder('Pilih')
+                                    ->searchable()
+                                    ->options(Customer::all()->pluck('nama_customer', 'id')->toArray())
+                                    ->reactive()
+                                    // ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        // Mencari customer berdasarkan ID yang dipilih
+                                        $customer = Customer::where('id', $state)->get()->first();
+                                        $catatan = $customer->catatan ?? null;
 
 
-                        TextInput::make('so_no')
-                            ->label('No.SO')
-                            ->default('SO_' .  date('ymd') . "_" . str_pad(SalesOrder::max('id') + 1, 4, '0', STR_PAD_LEFT)),
-                        Select::make('customer_id')
-                            ->label('Nama Pelanggan')
-                            ->placeholder('Pilih')
-                            ->searchable()
-                            ->options(Customer::all()->pluck('nama_customer', 'id'))
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set) {
-                                // Mencari customer berdasarkan ID yang dipilih
-                                $customer = Customer::with(['kelas', 'kategori_customer'])->find($state);
+                                        if ($customer) {
+                                            // dd($customer);
+                                            // Mendapatkan class dan chanel dari customer
+                                            $customerClass = CustomerClass::where('id', $customer->customer_class_id)->pluck('name')->first();
+                                            $customerCategory = CustomerCategory::where('id', $customer->customer_category_id)->pluck('name')->first();
 
-                                if ($customer) {
-                                    // Mendapatkan class dan chanel dari customer
-                                    $customerClass = $customer->kelas;
-                                    $customerCategory = $customer->kategori_customer;
+                                            // Mengupdate nilai customer_class_id dan customer_category_id
+                                            $set('customer_class_id', $customerClass ? $customerClass : null);
+                                            $set('customer_category_id', $customerCategory ? $customerCategory : null);
+                                            $set('catatan', $catatan ? $catatan : null);
+                                        } else {
+                                            // Jika customer tidak ditemukan, set nilai ke null
+                                            $set('customer_class_id', null);
+                                            $set('customer_category_id', null);
+                                            $set('catatan', null);
+                                        }
+                                    })
+                                    ->relationship('customer', 'nama_customer')
+                                    ->createOptionForm(fn (Form $form) => CustomerResource::form($form) ?? [])
+                                    ->editOptionForm(fn (Form $form) => CustomerResource::form($form) ?? [])
+                                    ->createOptionAction(fn ($action) => $action->modalWidth(MaxWidth::FiveExtraLarge)),
 
-                                    // Mengupdate nilai customer_class_id dan customer_category_id
-                                    $set('customer_class_id', $customerClass ? $customerClass->name : null);
-                                    $set('customer_category_id', $customerCategory ? $customerCategory->name : null);
-                                } else {
-                                    // Jika customer tidak ditemukan, set nilai ke null
-                                    $set('customer_class_id', null);
-                                    $set('customer_category_id', null);
-                                }
-                            })
-                            ->relationship('customer', 'nama_customer')
-                            ->createOptionForm(fn (Form $form) => CustomerResource::form($form) ?? [])
-                            ->editOptionForm(fn (Form $form) => CustomerResource::form($form) ?? [])
-                            ->createOptionAction(fn ($action) => $action->modalWidth(MaxWidth::FiveExtraLarge)),
+                                TextInput::make('customer_class_id')
+                                    ->reactive()
+                                    ->readOnly()
+                                    ->afterStateHydrated(function ($set, $get) {
+                                        $customerId = $get('customer_id');
+                                        if ($customerId) {
+                                            $catatan = CustomerClass::where('id', $customerId)->pluck('name')->first();
+                                            $set('customer_class_id', $catatan);
+                                        }
+                                    })
 
-                        TextInput::make('customer_class_id')
-                            ->label('Class')
-                            ->default(fn ($get) => optional(Customer::with('kelas')->find($get('customer_id')))->kelas?->name)
-                            ->disabled(),
+                                    ->label('Class'),
 
-                        TextInput::make('customer_category_id')
-                            ->label('Chanel')
-                            ->default(fn ($get) => optional(Customer::with('kategori_customer')->find($get('customer_id')))->kategori_customer?->name)
-                            ->disabled(),
+                                TextInput::make('customer_category_id')
+                                    ->reactive()
+                                    ->readOnly()
+                                    ->afterStateHydrated(function ($set, $get) {
+                                        $customerId = $get('customer_id');
+                                        if ($customerId) {
+                                            $catatan = CustomerCategory::where('id', $customerId)->pluck('name')->first();
+                                            $set('customer_category_id', $catatan);
+                                        }
+                                    })
+                                    ->label('Kategori'),
 
-                        DatePicker::make('tanggal')
-                            ->default(now())
-                            ->native(false)
-                            ->displayFormat('d/m/Y')
-                    ])->columns(5),
+                                DatePicker::make('tanggal')
+                                    ->default(now())
+                                    ->native(false)
+                                    ->displayFormat('d/m/Y'),
+
+                                TextArea::make('catatan')
+                                    ->label('Catatan Tentang Customer')
+                                    ->reactive()
+                                    ->afterStateHydrated(function ($set, $get) {
+                                        $customerId = $get('customer_id');
+                                        if ($customerId) {
+                                            $catatan = Customer::where('id', $customerId)->pluck('catatan')->first();
+                                            $set('catatan', $catatan);
+                                        }
+                                    }),
+                            ])->columns(2),
+
+                        Card::make('Total Bayar')
+                            ->columnSpan([
+                                'md' => 2,
+                            ])
+                            ->schema([
+                                TextInput::make('subtotal')
+                                    ->mask(RawJs::make('$money($input)'))
+                                    ->stripCharacters(',')
+                                    ->readOnly()
+                                    ->label('Total Belanja')
+                                    ->reactive()
+                                    ->afterStateHydrated(function ($set, $get) {
+                                        $salesOrderId = $get('id');
+                                        if ($salesOrderId) {
+                                            $sum = SalesDetail::where('sales_order_id', $salesOrderId)->sum('subtotal');
+                                            $formattedSum = $sum ? $sum : 0;
+                                            $set('subtotal', $formattedSum);
+
+                                            // Hitung grand total saat subtotal diinisialisasi
+                                            $diskon = (float) str_replace(',', '', $get('diskon'));
+                                            $ongkir = (float) str_replace(',', '', $get('ongkir'));
+                                            $grandTotal = $sum - $diskon + $ongkir;
+                                            $set('grand_total', number_format($grandTotal, 2, '.', ','));
+                                        }
+                                    }),
+
+                                TextInput::make('diskon')
+                                    ->mask(RawJs::make('$money($input)'))
+                                    ->stripCharacters(',')
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, $set, $get) {
+                                        $diskon = is_numeric(str_replace(',', '', $state)) ? str_replace(',', '', $state) : 0;
+                                        $ongkir = is_numeric(str_replace(',', '', $get('ongkir'))) ? str_replace(',', '', $get('ongkir')) : 0;
+
+                                        $totalBelanja = SalesDetail::where('sales_order_id', $get('id'))->sum('subtotal');
+
+                                        if ($totalBelanja === null) {
+                                            $totalBelanja = 0;
+                                        }
+
+                                        $grandTotal = $totalBelanja - $diskon + $ongkir;
+                                        $set('grand_total', number_format($grandTotal, 2, '.', ','));
+                                    })
+                                    ->label('Diskon'),
+
+                                TextInput::make('ongkir')
+                                    ->mask(RawJs::make('$money($input)'))
+                                    ->stripCharacters(',')
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, $set, $get) {
+                                        $diskon = is_numeric(str_replace(',', '', $get('diskon'))) ? str_replace(',', '', $get('diskon')) : 0;
+                                        $ongkir = is_numeric(str_replace(',', '', $state)) ? str_replace(',', '', $state) : 0;
+
+                                        $totalBelanja = SalesDetail::where('sales_order_id', $get('id'))->sum('subtotal');
+
+                                        if ($totalBelanja === null) {
+                                            $totalBelanja = 0;
+                                        }
+
+                                        $grandTotal = $totalBelanja - $diskon + $ongkir;
+                                        $set('grand_total', number_format($grandTotal, 2, '.', ','));
+                                    })
+                                    ->label('Ongkir'),
+
+                                TextInput::make('grand_total')
+                                    ->mask(RawJs::make('$money($input)'))
+                                    ->stripCharacters(',')
+                                    ->reactive()
+                                    ->label('Total')
+                                    ->readOnly()
+                                    ->afterStateHydrated(function ($set, $get) {
+                                        $diskon = (float) str_replace(',', '', $get('diskon'));
+                                        $ongkir = (float) str_replace(',', '', $get('ongkir'));
+                                        $totalBelanja = SalesDetail::where('sales_order_id', $get('id'))->sum('subtotal');
+                                        $totalBelanja = $totalBelanja ? $totalBelanja : 0; // Pastikan total belanja tidak null
+                                        $grandTotal = $totalBelanja - $diskon + $ongkir;
+                                        // $set('grand_total', $grandTotal);
+                                        $set('grand_total', number_format($grandTotal, 2, '.', ','));
+                                    }),
+                            ])
+
+                    ]),
+
+
+
             ]);
     }
 

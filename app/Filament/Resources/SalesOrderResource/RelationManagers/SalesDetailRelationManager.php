@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\SalesDetail;
 use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -24,6 +26,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Redirect;
 
 class SalesDetailRelationManager extends RelationManager
 {
@@ -68,48 +71,16 @@ class SalesDetailRelationManager extends RelationManager
                         }
                     })
                     ->columnSpan(1),
-                // Select::make('product_id')
-                //     ->label('Product')
-                //     ->options(Product::query()->pluck('nama_produk', 'id'))
-                //     ->required()
-                //     ->live(onBlur: true)
-                //     ->afterStateUpdated(function ($state, Forms\Set $set, Get $get) {
-                //         $ketemu = Product::find($state);
-                //         if ($ketemu) {
-                //             $satuan = $get('satuan');
-                //             $harga = match ($satuan) {
-                //                 'ctn' => $ketemu->price_ctn,
-                //                 'box' => $ketemu->price_box,
-                //                 'bag' => $ketemu->price_bag,
-                //                 'card' => $ketemu->price_card,
-                //                 'lusin' => $ketemu->price_lsn,
-                //                 'pack' => $ketemu->price_pack,
-                //                 'pcs' => $ketemu->price_pcs,
-                //                 default => 0,
-                //             };
-                //             $subtotal = $get('qty') * $harga;
-                //             $set('harga', $harga);
-                //             $set('subtotal', $subtotal);
-                //         } else {
-                //             $set('harga', 0);
-                //             $set('subtotal', 0);
-                //         }
-                //     })
-                //     ->distinct()
-                //     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                //     ->columnSpan(['md' => 1])
-                //     ->searchable(),
+
                 Select::make('product_id')
                     ->label('Product')
                     ->options(function () {
                         // Ambil semua id produk yang sudah ada di 'sales_detail'
                         $existingProductIds = SalesDetail::whereNotNull('id')->pluck('product_id')->toArray();
-
                         // Kueri produk yang tidak termasuk dalam daftar id yang sudah ada
                         $products = Product::query()
                             ->whereNotIn('id', $existingProductIds)
                             ->pluck('nama_produk', 'id');
-
                         return $products;
                     })
                     // Sisipkan logika lain seperti biasa
@@ -178,6 +149,7 @@ class SalesDetailRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+
             ->defaultGroup('koli')
             ->groupRecordsTriggerAction(
                 fn (Action $action) => $action
@@ -186,10 +158,11 @@ class SalesDetailRelationManager extends RelationManager
             )
             ->recordTitleAttribute('product_id')
             ->columns([
-                ImageColumn::make('gambar_produk')
-                    ->label('Gambar'),
+
                 TextColumn::make('product.nama_produk')
                     ->label('Nama Produk'),
+                ImageColumn::make('gambar_produk')
+                    ->label('Gambar'),
                 TextColumn::make('harga')
                     ->label('Harga'),
                 TextColumn::make('satuan')
@@ -213,7 +186,11 @@ class SalesDetailRelationManager extends RelationManager
             ])
             ->headerActions([
 
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->after(function ($action, $data) {
+                        return Redirect::to('SalesOrder');
+                    })
+                // ->refreshOnSuccess(),
             ])
 
             ->actions([
@@ -227,12 +204,11 @@ class SalesDetailRelationManager extends RelationManager
                         ->icon('heroicon-m-check')
                         ->requiresConfirmation()
                         ->form([
-
                             Select::make('koli')
                                 ->label('Koli')
                                 ->options(function () {
                                     $koliExisting = SalesDetail::whereNotNull('koli')->pluck('koli')->toArray();
-                                    $lastKoli = max($koliExisting);
+                                    $lastKoli = !empty($koliExisting) ? max($koliExisting) : 0;
                                     $nextKoli = $lastKoli ? $lastKoli + 1 : 1;
 
                                     $options = [
@@ -248,6 +224,7 @@ class SalesDetailRelationManager extends RelationManager
                                     return $options;
                                 })
                                 ->default(null)
+
                                 ->distinct(),
 
                             // Select::make('koli')
@@ -294,8 +271,5 @@ class SalesDetailRelationManager extends RelationManager
                 ]),
 
             ]);
-        // ->contentFooter(view('filament.components.table-footer-order'));
-        // ->footer(view('filament.components.table-footer-order'));
-        // ->view("filament.components.table-footer-order");
     }
 }

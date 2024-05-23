@@ -17,8 +17,10 @@ return new class extends Migration
             $table->foreignId('team_id')->nullable()->constrained();
             $table->foreignId('user_id')->nullable()->constrained();
             $table->foreignId('customer_id')->nullable()->constrained();
-            $table->decimal('total_amount', 8, 2)->nullable();
-            $table->integer('total_barang')->nullable();
+            $table->decimal('subtotal', 8, 2)->nullable();
+            $table->integer('qty')->nullable();
+            $table->decimal('diskon', 18, 2)->nullable();
+            $table->decimal('grand_total', 18, 2)->nullable();
             $table->date('tanggal')->nullable();
             $table->timestamps();
         });

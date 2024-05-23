@@ -54,10 +54,10 @@ class Customer extends Model
 
     public function kelas()
     {
-        return $this->belongsTo(CustomerClass::class, 'customer_class_id');
+        return $this->belongsTo(CustomerClass::class, 'customer_id');
     }
     public function kategori_customer()
     {
-        return $this->belongsTo(CustomerCategory::class, 'customer_category_id');
+        return $this->belongsTo(CustomerCategory::class, 'customer_id');
     }
 }

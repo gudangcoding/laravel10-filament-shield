@@ -15,8 +15,11 @@ class SalesOrder extends Model
         'so_no',
         'team_id',
         'user_id',
-        'total_amount',
-        'total_barang',
+        'subtotal',
+        'qty',
+        'diskon',
+        'ongkir',
+        'grand_total',
         'tanggal',
     ];
 

@@ -18,15 +18,15 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('label_alamat')->default('Pusat');
             $table->string('negara')->default('INDONESIA');
-            $table->string('provinsi');
-            $table->string('kabupaten_kota');
-            $table->string('kecamatan');
-            $table->string('kelurahan_desa');
-            $table->string('rt_rw');
-            $table->string('alamat');
-            $table->string('no_unit');
-            $table->string('tambahan');
-            $table->string('kode_pos');
+            $table->string('provinsi')->nullable();
+            $table->string('kabupaten_kota')->nullable();
+            $table->string('kecamatan')->nullable();
+            $table->string('kelurahan_desa')->nullable();
+            $table->string('rt_rw')->nullable();
+            $table->string('alamat')->nullable();
+            $table->string('no_unit')->nullable();
+            $table->string('tambahan')->nullable();
+            $table->string('kode_pos')->nullable();
             $table->timestamps();
         });
     }

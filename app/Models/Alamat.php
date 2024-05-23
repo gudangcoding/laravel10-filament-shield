@@ -12,6 +12,8 @@ class Alamat extends Model
         'team_id',
         'user_id',
         'negara',
+        'provinsi',
+        'kabupaten_kota',
         'kecamatan',
         'kelurahan_desa',
         'rt_rw',

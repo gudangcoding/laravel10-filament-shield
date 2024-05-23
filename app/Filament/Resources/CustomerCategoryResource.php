@@ -6,6 +6,8 @@ use App\Filament\Resources\CustomerCategoryResource\Pages;
 use App\Filament\Resources\CustomerCategoryResource\RelationManagers;
 use App\Models\CustomerCategory;
 use Filament\Forms;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -23,11 +25,10 @@ class CustomerCategoryResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('team_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('user_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('name')
+
+                Hidden::make('user_id')
+                    ->default(auth()->user()->id),
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
             ]);

@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('kode_customer')->nullable()->unique();
             $table->foreignId('team_id')->nullable()->constrained();
             $table->foreignId('user_id')->nullable()->constrained();
+            $table->foreignId('customer_class_id')->nullable()->constrained();
+            $table->foreignId('customer_category_id')->nullable()->constrained();
             $table->string('nama_customer');
             $table->string('daerah_customer')->nullable();
-            $table->foreignId('customer_class_id')->nullable()->constrained();
-            $table->foreignId('customer_category_id')->nullable()->constrained()->cascadeOnDelete();
             $table->decimal('sisa_limit_hutang', 10, 2)->default(0);
             $table->decimal('total_hutang', 10, 2)->default(0);
             $table->decimal('hutang_dlm_tempo', 10, 2)->default(0);

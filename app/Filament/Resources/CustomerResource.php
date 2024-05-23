@@ -71,13 +71,15 @@ class CustomerResource extends Resource
                             ->placeholder('toko/online')
                             ->searchable()
                             ->options(CustomerCategory::all()->pluck('name', 'id'))
-                            ->createOptionForm([
-                                TextInput::make('name')
-                                    ->label('Kelas Pelanggan')
-                                    ->required()
-                                    ->maxLength(255),
-                            ])
                             ->createOptionAction(fn ($action) => $action->modalWidth('sm'))
+                            //memanggil form tambah
+                            ->createOptionForm(fn (Form $form) => CustomerCategoryResource::form($form) ?? [])
+                            // //memanggil form edit harus ada relasi
+                            // ->relationship('kategori_customer')
+                            // // ->editOptionForm(fn (Form $form, $get) => CustomerCategoryResource::form($form) ?? [])
+                            // ->editOptionForm(fn (Form $form, $get) => CustomerClassResource::form($form)
+                            //     ->model(CustomerClass::find($get('customer_id'))) ?? [])
+                            //aksi untuk form
                             ->createOptionUsing(function ($data) {
                                 $cus_cat = CustomerCategory::create($data);
                                 return $cus_cat->id;
@@ -132,6 +134,8 @@ class CustomerResource extends Resource
                                                 'mba' => 'Mba',
                                                 'h' => 'H',
                                                 'hj' => 'Hj',
+                                                'haji' => 'Haji',
+                                                'hajah' => 'Hajah',
                                                 'tk' => 'Tk'
                                             ]),
                                         TextInput::make('no_hp')->label('No. HP'),

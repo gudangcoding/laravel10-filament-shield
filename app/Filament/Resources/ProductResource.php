@@ -80,6 +80,7 @@ class ProductResource extends Resource
                         // SpatieMediaLibraryFileUpload::make('gambar_produk')->image(),
 
                         TextInput::make('kode_produk')
+                            ->default('P-' . str_pad(Product::max('id') + 1, 4, '0', STR_PAD_LEFT))
                             ->label('Kode Produk')
                             ->required(),
                         TextInput::make('nama_produk_cn')
