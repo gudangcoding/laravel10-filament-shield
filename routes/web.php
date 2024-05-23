@@ -17,7 +17,8 @@ use App\Http\Controllers\InvoiceController;
 Route::get('/', function () {
     return view('welcome');
 });
-// Route::get('/invoice', [PdfController::class, 'invoice'])->name('invoice.download');
+
+Route::get('/invoice', [PdfController::class, 'invoice'])->name('invoice');
 
 
 

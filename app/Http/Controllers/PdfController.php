@@ -23,7 +23,10 @@ class PdfController extends Controller
 
         // $pdf = Pdf::loadView('pdf');
 
+        // $salesDetails = $salesOrder->salesDetails;
 
+        // Logika untuk menampilkan halaman cetak
+        // return view('salesorder.print', compact('salesOrder', 'salesDetails'));
 
         $data = [
             [
@@ -41,8 +44,9 @@ class PdfController extends Controller
         // $pdf = Pdf::loadView('pdf',  $data);
         $pdf = Pdf::loadView('pdf', ['record' => $data]);
 
-        // return $pdf->download();
+
+        return $pdf->download();
+        // return $pdf->stream();
         // return $pdf->download($order->order_number . '.pdf');
-        return $pdf->stream();
     }
 }
