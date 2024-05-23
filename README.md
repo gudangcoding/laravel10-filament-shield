@@ -221,4 +221,7 @@ public static function shouldRegisterNavigation(): bool
     }
     </pre>
 </li>
+<li>
+buat faktur pakai escpos-php
+</li>
 </ol>
