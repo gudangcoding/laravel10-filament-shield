@@ -212,6 +212,9 @@ https://www.enterprisedb.com/download-postgresql-binaries
 </li>
 <li>
 <h3>Jika bukan super_admin hide role menu</h3>
+<p>
+lokasi file di vendor/bezhansalleh/filament-shield/src/Resources/RoleResource.php
+</p>
 <pre>
 public static function shouldRegisterNavigation(): bool
     {
@@ -219,6 +222,12 @@ public static function shouldRegisterNavigation(): bool
         //hide menu jika bukan super admin
         return auth()->user()->hasAnyRole(['admin', 'super_admin']);
     }
+    </pre>
+    <p>Hide Tenant Menu, Lokasi File di app/Providers/Filament/AdminPanelProvider.php</p>
+<pre>
+->tenantMenu(function () {
+                return auth()->user()->hasRole('super_admin'); // Check for super_admin role
+            })
     </pre>
 </li>
 <li>

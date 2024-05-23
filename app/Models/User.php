@@ -16,11 +16,13 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasTenants
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasPanelShield;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasPanelShield, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -71,19 +73,20 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         // Contoh implementasi sederhana: mengizinkan akses ke semua panel
         return true;
     }
-    // public function team()
-    // {
-    //     return $this->belongsTo(Team::class);
-    // }
+
 
     public function team()
     {
         return $this->teams()->where('team_id', Filament::getTenant()->id);
     }
 
-    // public function roles(): BelongsToMany
-    // {
-    //     return $this->belongsToMany(\Spatie\Permission\Models\Role::class, 'model_has_roles', 'model_id', 'role_id')
-    //         ->where('model_type', User::class);
-    // }
+    // protected static $logUnguarded = true;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            // ->logFillable();
+            ->logExcept(['password', 'email']);
+    }
 }

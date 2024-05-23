@@ -197,14 +197,14 @@ class SalesOrderResource extends Resource
                                         $diskon = is_numeric(str_replace(',', '', $get('diskon'))) ? str_replace(',', '', $get('diskon')) : 0;
                                         $ongkir = is_numeric(str_replace(',', '', $state)) ? str_replace(',', '', $state) : 0;
 
-                                        $totalBelanja = SalesDetail::where('sales_order_id', $get('id'))->sum('subtotal');
+                                        $totalBelanja = SalesDetail::where('sales_order_id', $get('id'))->sum('subtotal') ?? 0;
 
                                         if ($totalBelanja === null) {
                                             $totalBelanja = 0;
                                         }
 
                                         $grandTotal = $totalBelanja - $diskon + $ongkir;
-                                        $set('grand_total', number_format($grandTotal, 2, '.', ','));
+                                        $set('grand_total', number_format($grandTotal, 2, '.', ',') ?? 0);
                                     })
                                     ->label('Ongkir'),
 
@@ -221,7 +221,7 @@ class SalesOrderResource extends Resource
                                         $totalBelanja = $totalBelanja ? $totalBelanja : 0; // Pastikan total belanja tidak null
                                         $grandTotal = $totalBelanja - $diskon + $ongkir;
                                         // $set('grand_total', $grandTotal);
-                                        $set('grand_total', number_format($grandTotal, 2, '.', ','));
+                                        $set('grand_total', number_format($grandTotal, 2, '.', ',') ?? 0);
                                     }),
                             ])
 
@@ -252,6 +252,7 @@ class SalesOrderResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('Log Order')->url(fn ($record) => SalesOrderResource::getUrl('aktifitas', ['record' => $record]))
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -274,6 +275,7 @@ class SalesOrderResource extends Resource
             'index' => Pages\ListSalesOrders::route('/'),
             'create' => Pages\CreateSalesOrder::route('/create'),
             'edit' => Pages\EditSalesOrder::route('/{record}/edit'),
+            'aktifitas' => Pages\ListSalesOrders::route('/{record}/aktifitas'),
         ];
     }
 }
