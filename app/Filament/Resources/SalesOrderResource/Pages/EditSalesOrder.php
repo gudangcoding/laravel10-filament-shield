@@ -47,6 +47,6 @@ class EditSalesOrder extends EditRecord
         $printUrl = URL::route('invoices.print', ['salesOrder' => $salesOrderId]);
         // $printUrl = URL::route('invoice', ['salesOrder' => $salesOrderId]);
 
-        // Redirect::away($printUrl, '_blank');
+        Redirect::away($printUrl, '_blank');
     }
 }

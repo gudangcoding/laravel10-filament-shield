@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('subtotal', 8, 2)->nullable();
             $table->integer('qty')->nullable();
             $table->decimal('diskon', 18, 2)->nullable();
+            $table->decimal('ongkir', 18, 2)->nullable();
             $table->decimal('grand_total', 18, 2)->nullable();
             $table->date('tanggal')->nullable();
             $table->timestamps();

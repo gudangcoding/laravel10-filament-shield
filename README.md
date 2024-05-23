@@ -213,7 +213,7 @@ https://www.enterprisedb.com/download-postgresql-binaries
 <li>
 <h3>Jika bukan super_admin hide role menu</h3>
 <p>
-lokasi file di vendor/bezhansalleh/filament-shield/src/Resources/RoleResource.php
+lokasi file di vendor/bezhansalleh/filament-shield/src/Resources/RoleResource.php Baris 161
 </p>
 <pre>
 public static function shouldRegisterNavigation(): bool
