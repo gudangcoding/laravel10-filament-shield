@@ -235,17 +235,17 @@ buat faktur pakai escpos-php
 </li>
 <li>
     <p>Untuk Mengambil data berdasarkan User ID yang Login Saja</p>
-    public static function table(Table $table): Table
-    {
-        $user = Auth::user();
-        $userId = $user->id;
-        return $table
-            ->modifyQueryUsing(function (Builder $query) use ($userId) {
-                // filter jika bukan super_admin
-                if (!auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
-                    $query->where('user_id', $userId);
-                }
-            })
-    }
+    public static function table(Table $table): Table<br>
+    {<br>
+        $user = Auth::user();<br>
+        $userId = $user->id;<br>
+        return $table<br>
+            ->modifyQueryUsing(function (Builder $query) use ($userId) {<br>
+                // filter jika bukan super_admin<br>
+                if (!auth()->user()->hasAnyRole(['admin', 'super_admin'])) {<br>
+                    $query->where('user_id', $userId);<br>
+                }<br>
+            })<br>
+    }<br>
 </li>
 </ol>
