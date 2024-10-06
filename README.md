@@ -235,7 +235,7 @@ buat faktur pakai escpos-php
 </li>
 <li>
     <p>Untuk Mengambil data berdasarkan User ID yang Login Saja</p>
-    public static function table(Table $table): Table<br>
+    <code>public static function table(Table $table): Table<br>
     {<br>
         $user = Auth::user();<br>
         $userId = $user->id;<br>
@@ -246,6 +246,6 @@ buat faktur pakai escpos-php
                     $query->where('user_id', $userId);<br>
                 }<br>
             })<br>
-    }<br>
+    }</code><br>
 </li>
 </ol>
