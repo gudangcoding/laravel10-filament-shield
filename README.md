@@ -2,7 +2,10 @@
 <img src='pos1.png'><br>
 <ol>
     <li><pre>composer create-project laravel/laravel:^10.0 nama_proyek</pre></li>
-    <li><pre>composer require filament/filament:"^3.2" -W</pre></li>
+    <li><pre>composer require -W --dev laravel-shift/blueprint</pre></li>
+    <li><pre>php artisan blueprint:new</pre></li>
+    <li>kode diatas akan membuat file draft.yaml, untuk susunan database bisa gunakan AI dengan ekstensi Chat GPT</li>
+    <li><pre>composer require filament/filament</pre></li>
     <li><pre>php artisan filament:install --panels</pre></li>
     <li><pre>php artisan migrate</pre></li>
     <li><pre>php artisan make:filament-user</pre></li>
