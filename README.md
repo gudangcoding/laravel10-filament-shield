@@ -5,6 +5,8 @@
     <li><pre>composer require -W --dev laravel-shift/blueprint</pre></li>
     <li><pre>php artisan blueprint:new</pre></li>
     <li>kode diatas akan membuat file draft.yaml, untuk susunan database bisa gunakan AI dengan ekstensi Chat GPT</li>
+    <li><pre>php artisan blueprint:build</pre></li>
+    <li>perintah diatas akan membuatkan model sesuai dengan skema pada draft.yaml</li>
     <li><pre>composer require filament/filament</pre></li>
     <li><pre>php artisan filament:install --panels</pre></li>
     <li><pre>php artisan migrate</pre></li>
